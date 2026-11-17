@@ -161,3 +161,17 @@ def test_history_survives_a_write_and_read_round_trip(tmp_path):
     assert back[0]["first_run"] is True
     assert back[1]["status"] == "removed"
     assert back[1]["removed_date"] == "2026-11-02"
+
+
+def test_a_source_that_lists_nothing_still_removes_its_postings():
+    """If a raw file exists and lists nothing, that is a real emptying.
+
+    The guard against a mistaken empty read lives in the fetch step, which
+    writes no raw file at all in that case; the build trusts what it is given.
+    """
+    rows = rows_by_id(build_history([
+        ("2026-11-01", {"acme": [posting("1")]}),
+        ("2026-11-02", {"acme": []}),
+    ]))
+    assert rows["acme:1"]["status"] == "removed"
+    assert rows["acme:1"]["removed_date"] == "2026-11-02"

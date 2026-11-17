@@ -47,11 +47,26 @@ def fetch_source(source: dict, run_date: str, raw_root: Path | None = None) -> d
         "fetched_at": utc_now(),
         "payload": payload,
     }
-    store.write_raw(run_date, source["name"], envelope, raw_root)
 
     # Count the postings the way the build will read them, not the board's own
     # reported total, which Workday caps.
     rows = adapter.normalize(source, envelope)
+
+    # Every board on this watch list always has openings, so a clean response
+    # carrying none means the read went wrong - a renamed site, a board moved
+    # behind a login - rather than an employer with nothing open. Writing that
+    # out would mark every one of this source's postings removed, so it counts
+    # as a failed source instead and the day simply says nothing about it.
+    if not rows:
+        return {
+            "name": source["name"],
+            "employer": source["employer"],
+            "ok": False,
+            "count": 0,
+            "error": "the board returned no postings; treated as a failed read",
+        }
+
+    store.write_raw(run_date, source["name"], envelope, raw_root)
     return {
         "name": source["name"],
         "employer": source["employer"],
