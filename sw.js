@@ -12,9 +12,16 @@
  *     meant to fall back to.
  */
 
-const VERSION = "v1";
+//: Bump on every deploy that changes a page, stylesheet or script. Activating
+//: a new version clears the old shell, so an installed app picks the change up
+//: instead of serving yesterday's page from cache.
+const VERSION = "v2";
 const SHELL_CACHE = `job-watcher-shell-${VERSION}`;
-const DATA_CACHE = `job-watcher-data-${VERSION}`;
+
+//: Deliberately not versioned. The data cache is the offline copy of the two
+//: data files, so it has to survive a deploy: clearing it would leave someone
+//: who is offline with a working app and nothing to show in it.
+const DATA_CACHE = "job-watcher-data";
 
 const SHELL = [
   "./",

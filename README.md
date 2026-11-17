@@ -58,7 +58,7 @@ uv run pytest                           # the test suite
 
 ## The watch list
 
-Sixteen employers across three applicant tracking systems. Every board returns
+Eighteen employers across three applicant tracking systems. Every board returns
 JSON to a request made with no login; none of them is read as HTML.
 
 | # | Employer | Applicant tracking system | Board |
@@ -76,9 +76,15 @@ JSON to a request made with no login; none of them is read as HTML.
 | 11 | J.B. Hunt Transport Services | Workday | `jbhunt.wd501` / `Careers` |
 | 12 | The Coca-Cola Company | Workday | `coke.wd1` / `coca-cola-careers` |
 | 13 | Acxiom | Workday | `acxiomllc.wd5` / `AcxiomUSA` |
-| 14 | FedEx | Workday | `fedex.wd1` / `FXE-MEISA-External` |
-| 15 | Amazon | Amazon Jobs (in-house) | `amazon.jobs/en/search.json` |
-| 16 | JPMorgan Chase | Oracle Recruiting Cloud | `jpmc.fa.oraclecloud.com` |
+| 14 | Arkansas Children's | Workday | `archildrens.wd1` / `external_career_site` |
+| 15 | University of Arkansas System | Workday | `uasys.wd5` / `UASYS` |
+| 16 | FedEx | Workday | `fedex.wd1` / `FXE-MEISA-External` |
+| 17 | Amazon | Amazon Jobs (in-house) | `amazon.jobs/en/search.json` |
+| 18 | JPMorgan Chase | Oracle Recruiting Cloud | `jpmc.fa.oraclecloud.com` |
+
+Arkansas Children's and the University of Arkansas System are on the list for
+Little Rock and Northwest Arkansas, which the national employers above barely
+cover on their own.
 
 The Federal Reserve board is the shared Federal Reserve System one, so the
 St. Louis and Dallas banks both come through that single source.
@@ -148,6 +154,36 @@ role; `in_role` is only a label, and the Browse page switches between the two.
 
 ---
 
+## The region rule
+
+Every board writes locations its own way — `Dallas, TX`, `US - GA - Atlanta`,
+`USA-AR-FORT-SMITH-08134-SAMS-CLUB`, `Bellevue, Washington, USA`, `Conway`,
+`Remote/Homebased`, `2 Locations` — so there is no location field they share.
+`src/jobwatcher/region.py` sorts each posting into exactly one region from its
+location text, and the Browse page filters on it.
+
+Three regions are **primary**, the ones this watch is aimed at:
+
+| Region | Covers |
+|---|---|
+| Northwest Arkansas | Fayetteville, Bentonville, Rogers, Springdale, Bella Vista, Siloam Springs |
+| Little Rock | Little Rock, North Little Rock, Maumelle, Conway, Benton, Bryant |
+| Dallas–Fort Worth | Dallas, Fort Worth, Plano, Irving, Frisco, Arlington and the rest of the metroplex |
+
+Anything else falls back, in order, to: `Remote`, `Multiple locations` (what
+Workday writes when one posting covers several places), the US state, then
+`International`, `Other U.S.` or `Other`.
+
+The order matters, because a city name alone is not enough. **The state always
+beats a shared city name**, so `Fayetteville, NC` is North Carolina rather than
+Northwest Arkansas, `Arlington, VA` is Virginia rather than Dallas–Fort Worth,
+and `Conway, SC` is South Carolina. Only when a board names no state at all —
+Acxiom writes just `Conway` — does a short list of distinctive city names decide
+it. A two-letter state code counts only when the board capitalised it, so an
+ordinary word is never read as a state.
+
+---
+
 ## The data
 
 Two files at fixed paths. The site loads both in the browser and does all the
@@ -174,6 +210,11 @@ One row per posting.
 | `last_seen` | Last day its source listed it |
 | `status` | `open` or `removed` |
 | `removed_date` | The day it was marked removed |
+| `region` | The region the location falls in (see below) |
+
+`region` is the one column beyond what the project asks for. It is appended
+after `removed_date`, so the required columns keep the exact order the project
+lists them in.
 
 Dates are UTC dates written `YYYY-MM-DD`; every run takes the UTC date of the
 moment it runs. A column a source does not provide is left empty for that
@@ -219,10 +260,11 @@ Each loads the two data files and computes everything in the browser.
   days open; a search box matching titles; a sort by first-seen date; an apply
   link on every posting; and a star that saves a posting to a shortlist kept in
   the browser, which survives a reload.
-* **`market.html` — Market.** Six sections, each with a heading that states the
+* **`market.html` — Market.** Seven sections, each with a heading that states the
   finding, a paragraph explaining it, and a chart: new postings per day (all and
   in role), removed postings per day, open postings per employer, days open with
-  the median, the share removed within seven days, and the top locations.
+  the median, the share removed within seven days, the top locations, and a seventh section of
+  my own: open postings by region.
   Postings with `first_run` set are left out of the definitions that need a real
   start date.
 
@@ -245,6 +287,7 @@ be fetched from a CDN for the installed app to work.
 | `src/jobwatcher/adapters/amazon.py` | Reads Amazon's `search.json` board |
 | `src/jobwatcher/adapters/oracle.py` | Reads Oracle Recruiting Cloud boards |
 | `src/jobwatcher/role.py` | The title rule |
+| `src/jobwatcher/region.py` | Turns a board's location text into one region |
 | `src/jobwatcher/history.py` | First-seen, last-seen and removed logic; reads and writes `history.csv` |
 | `src/jobwatcher/store.py` | Paths on disk and the raw-file reader and writer |
 | `src/jobwatcher/fetch.py` | Calls every source, saves raw files, records each result |
@@ -253,6 +296,8 @@ be fetched from a CDN for the installed app to work.
 | `src/jobwatcher/cli.py` | The `fetch`, `build`, `issue` and `run` commands |
 | `scripts/make_icons.py` | Generates the app icons the manifest points at |
 | `tests/test_role.py` | Tests for the title rule |
+| `tests/test_region.py` | Tests for the region rule |
+| `tests/test_fetch.py` | Tests that a failed source is recorded and does not stop the run |
 | `tests/test_normalize.py` | Tests converting each source to the common columns |
 | `tests/test_history.py` | Tests for first-seen, last-seen and removed logic |
 | `.github/workflows/daily.yml` | The daily run: fetch, build, issue, commit |

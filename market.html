@@ -297,6 +297,40 @@ try {
     }
   }
 
+  /* ---- 7. Open postings by region ---------------------------------- */
+  {
+    const PRIMARY = ["Northwest Arkansas", "Little Rock", "Dallas-Fort Worth"];
+    const byRegion = countBy(openRows, "region");
+    const totalOpen = openRows.length;
+    const primaryCount = openRows.filter((r) => PRIMARY.includes(r.region)).length;
+    const primaryShare = totalOpen ? (primaryCount / totalOpen) * 100 : 0;
+
+    const named = new Map(byRegion.map((d) => [d.label, d.value]));
+    // The three primary regions always appear, at zero if need be, so a region
+    // with nothing open reads as "nothing here" rather than silently vanishing.
+    const chartRows = [
+      ...PRIMARY.map((label) => ({ label: `★ ${label}`, value: named.get(label) || 0 })),
+      ...byRegion.filter((d) => !PRIMARY.includes(d.label)).slice(0, 12),
+    ];
+
+    const { node, chart } = section(
+      `${esc(primaryCount.toLocaleString())} open postings sit in my three primary regions, ${esc(primaryShare.toFixed(1))}% of everything watched`,
+      `Each board writes locations its own way, so every posting is sorted into one
+       region from its location text. The three starred regions are the ones this
+       watch is aimed at — Northwest Arkansas, Little Rock and Dallas–Fort Worth.
+       "Multiple locations" is Workday collapsing a posting listed in several places
+       into one line, which is why it is large and cannot be split further.`,
+    );
+
+    rankedBars(chart, chartRows, {
+      title: "Open postings by region",
+      color: SERIES_1,
+      labelWidth: 210,
+    });
+    tableView(node, ["Region", "Open postings"],
+      byRegion.map((d) => [d.label, d.value]));
+  }
+
   /* ---- 6. Top locations -------------------------------------------- */
   {
     const byLocation = countBy(openRows, "location").slice(0, 15);

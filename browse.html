@@ -54,6 +54,13 @@
         <select id="employer"><option value="">All employers</option></select>
       </div>
       <div class="field">
+        <label for="region">Region</label>
+        <select id="region">
+          <option value="">All regions</option>
+          <option value="__primary__">★ My primary regions</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="location">Location</label>
         <select id="location"><option value="">All locations</option></select>
       </div>
@@ -110,6 +117,10 @@ const asof = document.getElementById("asof");
 
 const STORE = "jobwatcher.shortlist";
 
+// Kept in step with jobwatcher/region.py, which writes the region column.
+const PRIMARY_REGIONS = ["Northwest Arkansas", "Little Rock", "Dallas-Fort Worth"];
+const PRIMARY_KEY = "__primary__";
+
 function readShortlist() {
   try {
     const raw = localStorage.getItem(STORE);
@@ -133,7 +144,7 @@ const shortlist = readShortlist();
 
 /* ---- rendering ------------------------------------------------------- */
 
-const state = { scope: "role", q: "", employer: "", location: "", days: "", sort: "desc", starred: false };
+const state = { scope: "role", q: "", employer: "", region: "", location: "", days: "", sort: "desc", starred: false };
 
 let open = [];
 let runDate = "";
@@ -148,6 +159,9 @@ function matches(row) {
   if (state.scope === "role" && !row.in_role) return false;
   if (state.starred && !shortlist.has(row.posting_id)) return false;
   if (state.employer && row.employer !== state.employer) return false;
+  if (state.region === PRIMARY_KEY) {
+    if (!PRIMARY_REGIONS.includes(row.region)) return false;
+  } else if (state.region && row.region !== state.region) return false;
   if (state.location && row.location !== state.location) return false;
   if (state.q && !row.title.toLowerCase().includes(state.q)) return false;
   if (state.days) {
@@ -164,6 +178,7 @@ function postingItem(row) {
   const meta = [
     row.employer,
     row.location,
+    row.region && row.region !== row.location ? row.region : "",
     row.department,
     `First seen ${formatDate(row.first_seen)}`,
     days === null ? "" : `${days} ${days === 1 ? "day" : "days"} open`,
@@ -262,6 +277,26 @@ try {
   };
 
   fillSelect("employer", counts("employer"));
+
+  // Regions: the three primary ones first and always listed, even at zero, so
+  // it is obvious when nothing is open there rather than the option vanishing.
+  const regionCounts = new Map(counts("region").map((d) => [d.label, d.value]));
+  const regionSelect = document.getElementById("region");
+  for (const name of PRIMARY_REGIONS) {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = `★ ${name} (${regionCounts.get(name) || 0})`;
+    regionSelect.append(option);
+    regionCounts.delete(name);
+  }
+  const divider = document.createElement("option");
+  divider.disabled = true;
+  divider.textContent = "──────────";
+  regionSelect.append(divider);
+  fillSelect("region", [...regionCounts.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label)));
+
   fillSelect("location", counts("location"));
 
   segmented("scope", (b) => { state.scope = b.dataset.scope; });
@@ -271,7 +306,7 @@ try {
     state.q = e.target.value.trim().toLowerCase();
     render();
   });
-  for (const id of ["employer", "location", "days", "sort"]) {
+  for (const id of ["employer", "region", "location", "days", "sort"]) {
     document.getElementById(id).addEventListener("change", (e) => {
       state[id] = e.target.value;
       render();
