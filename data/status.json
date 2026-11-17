@@ -1,8 +1,8 @@
 {
-  "run_time": "2026-11-17T18:30:40+00:00",
+  "run_time": "2026-11-17T18:48:34+00:00",
   "first_run_date": "2026-11-17",
   "days_with_success": 1,
-  "open": 15031,
+  "open": 15732,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
@@ -24,22 +24,22 @@
     {
       "name": "capital_one",
       "ok": true,
-      "count": 2081
+      "count": 2078
     },
     {
       "name": "truist",
       "ok": true,
-      "count": 1383
+      "count": 1381
     },
     {
       "name": "pnc",
       "ok": true,
-      "count": 1277
+      "count": 1275
     },
     {
       "name": "northern_trust",
       "ok": true,
-      "count": 662
+      "count": 661
     },
     {
       "name": "vanguard",
@@ -54,12 +54,12 @@
     {
       "name": "tyson_foods",
       "ok": true,
-      "count": 751
+      "count": 757
     },
     {
       "name": "jb_hunt",
       "ok": true,
-      "count": 440
+      "count": 438
     },
     {
       "name": "coca_cola",
@@ -69,7 +69,17 @@
     {
       "name": "acxiom",
       "ok": true,
-      "count": 36
+      "count": 34
+    },
+    {
+      "name": "arkansas_childrens",
+      "ok": true,
+      "count": 227
+    },
+    {
+      "name": "university_of_arkansas",
+      "ok": true,
+      "count": 798
     },
     {
       "name": "fedex",
@@ -84,7 +94,7 @@
     {
       "name": "jpmorgan_chase",
       "ok": true,
-      "count": 998
+      "count": 1000
     }
   ]
 }
