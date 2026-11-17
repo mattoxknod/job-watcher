@@ -1,0 +1,118 @@
+{
+  "run_date": "2026-11-17",
+  "run_time": "2026-11-17T18:26:58+00:00",
+  "sources": [
+    {
+      "count": 2000,
+      "employer": "Walmart",
+      "error": "",
+      "name": "walmart",
+      "ok": true
+    },
+    {
+      "count": 2022,
+      "employer": "Bank of America",
+      "error": "",
+      "name": "bank_of_america",
+      "ok": true
+    },
+    {
+      "count": 2000,
+      "employer": "Citi",
+      "error": "",
+      "name": "citi",
+      "ok": true
+    },
+    {
+      "count": 2084,
+      "employer": "Capital One",
+      "error": "",
+      "name": "capital_one",
+      "ok": true
+    },
+    {
+      "count": 1379,
+      "employer": "Truist",
+      "error": "",
+      "name": "truist",
+      "ok": true
+    },
+    {
+      "count": 1289,
+      "employer": "PNC Financial Services",
+      "error": "",
+      "name": "pnc",
+      "ok": true
+    },
+    {
+      "count": 663,
+      "employer": "Northern Trust",
+      "error": "",
+      "name": "northern_trust",
+      "ok": true
+    },
+    {
+      "count": 325,
+      "employer": "The Vanguard Group",
+      "error": "",
+      "name": "vanguard",
+      "ok": true
+    },
+    {
+      "count": 149,
+      "employer": "Federal Reserve System",
+      "error": "",
+      "name": "federal_reserve",
+      "ok": true
+    },
+    {
+      "count": 751,
+      "employer": "Tyson Foods",
+      "error": "",
+      "name": "tyson_foods",
+      "ok": true
+    },
+    {
+      "count": 440,
+      "employer": "J.B. Hunt Transport Services",
+      "error": "",
+      "name": "jb_hunt",
+      "ok": true
+    },
+    {
+      "count": 212,
+      "employer": "The Coca-Cola Company",
+      "error": "",
+      "name": "coca_cola",
+      "ok": true
+    },
+    {
+      "count": 36,
+      "employer": "Acxiom",
+      "error": "",
+      "name": "acxiom",
+      "ok": true
+    },
+    {
+      "count": 48,
+      "employer": "FedEx",
+      "error": "",
+      "name": "fedex",
+      "ok": true
+    },
+    {
+      "count": 682,
+      "employer": "Amazon",
+      "error": "",
+      "name": "amazon",
+      "ok": true
+    },
+    {
+      "count": 998,
+      "employer": "JPMorgan Chase",
+      "error": "",
+      "name": "jpmorgan_chase",
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "run_time": "2026-11-17T18:26:58+00:00",
+  "first_run_date": "2026-11-17",
+  "days_with_success": 1,
+  "open": 14970,
+  "new_today": 0,
+  "removed_today": 0,
+  "sources": [
+    {
+      "name": "walmart",
+      "ok": true,
+      "count": 2000
+    },
+    {
+      "name": "bank_of_america",
+      "ok": true,
+      "count": 2022
+    },
+    {
+      "name": "citi",
+      "ok": true,
+      "count": 2000
+    },
+    {
+      "name": "capital_one",
+      "ok": true,
+      "count": 2084
+    },
+    {
+      "name": "truist",
+      "ok": true,
+      "count": 1379
+    },
+    {
+      "name": "pnc",
+      "ok": true,
+      "count": 1289
+    },
+    {
+      "name": "northern_trust",
+      "ok": true,
+      "count": 663
+    },
+    {
+      "name": "vanguard",
+      "ok": true,
+      "count": 325
+    },
+    {
+      "name": "federal_reserve",
+      "ok": true,
+      "count": 149
+    },
+    {
+      "name": "tyson_foods",
+      "ok": true,
+      "count": 751
+    },
+    {
+      "name": "jb_hunt",
+      "ok": true,
+      "count": 440
+    },
+    {
+      "name": "coca_cola",
+      "ok": true,
+      "count": 212
+    },
+    {
+      "name": "acxiom",
+      "ok": true,
+      "count": 36
+    },
+    {
+      "name": "fedex",
+      "ok": true,
+      "count": 48
+    },
+    {
+      "name": "amazon",
+      "ok": true,
+      "count": 682
+    },
+    {
+      "name": "jpmorgan_chase",
+      "ok": true,
+      "count": 998
+    }
+  ]
+}
