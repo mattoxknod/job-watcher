@@ -1,6 +1,6 @@
 {
   "run_date": "2026-11-17",
-  "run_time": "2026-11-17T18:26:58+00:00",
+  "run_time": "2026-11-17T18:30:40+00:00",
   "sources": [
     {
       "count": 2000,
@@ -10,7 +10,7 @@
       "ok": true
     },
     {
-      "count": 2022,
+      "count": 2021,
       "employer": "Bank of America",
       "error": "",
       "name": "bank_of_america",
@@ -24,42 +24,42 @@
       "ok": true
     },
     {
-      "count": 2084,
+      "count": 2081,
       "employer": "Capital One",
       "error": "",
       "name": "capital_one",
       "ok": true
     },
     {
-      "count": 1379,
+      "count": 1383,
       "employer": "Truist",
       "error": "",
       "name": "truist",
       "ok": true
     },
     {
-      "count": 1289,
+      "count": 1277,
       "employer": "PNC Financial Services",
       "error": "",
       "name": "pnc",
       "ok": true
     },
     {
-      "count": 663,
+      "count": 662,
       "employer": "Northern Trust",
       "error": "",
       "name": "northern_trust",
       "ok": true
     },
     {
-      "count": 325,
+      "count": 323,
       "employer": "The Vanguard Group",
       "error": "",
       "name": "vanguard",
       "ok": true
     },
     {
-      "count": 149,
+      "count": 150,
       "employer": "Federal Reserve System",
       "error": "",
       "name": "federal_reserve",
@@ -94,7 +94,7 @@
       "ok": true
     },
     {
-      "count": 48,
+      "count": 47,
       "employer": "FedEx",
       "error": "",
       "name": "fedex",
