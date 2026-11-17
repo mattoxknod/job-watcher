@@ -1,20 +1,95 @@
 {
-  "run_time": "2026-11-17T19:05:32+00:00",
+  "run_time": "2026-11-17T19:19:28+00:00",
   "first_run_date": "2026-11-17",
   "days_with_success": 1,
-  "open": 17855,
+  "open": 17727,
   "new_today": 0,
   "removed_today": 0,
   "sources": [
     {
+      "name": "walmart",
+      "ok": true,
+      "count": 2000
+    },
+    {
+      "name": "bank_of_america",
+      "ok": true,
+      "count": 2021
+    },
+    {
+      "name": "citi",
+      "ok": true,
+      "count": 2000
+    },
+    {
+      "name": "capital_one",
+      "ok": true,
+      "count": 2077
+    },
+    {
+      "name": "truist",
+      "ok": true,
+      "count": 1381
+    },
+    {
+      "name": "pnc",
+      "ok": true,
+      "count": 1267
+    },
+    {
+      "name": "northern_trust",
+      "ok": true,
+      "count": 660
+    },
+    {
+      "name": "vanguard",
+      "ok": true,
+      "count": 324
+    },
+    {
+      "name": "federal_reserve",
+      "ok": true,
+      "count": 150
+    },
+    {
+      "name": "tyson_foods",
+      "ok": true,
+      "count": 757
+    },
+    {
+      "name": "jb_hunt",
+      "ok": true,
+      "count": 438
+    },
+    {
+      "name": "coca_cola",
+      "ok": true,
+      "count": 213
+    },
+    {
+      "name": "acxiom",
+      "ok": true,
+      "count": 34
+    },
+    {
+      "name": "arkansas_childrens",
+      "ok": true,
+      "count": 227
+    },
+    {
+      "name": "university_of_arkansas",
+      "ok": true,
+      "count": 799
+    },
+    {
       "name": "simmons_bank",
       "ok": true,
-      "count": 159
+      "count": 158
     },
     {
       "name": "trane_technologies",
       "ok": true,
-      "count": 1585
+      "count": 1580
     },
     {
       "name": "kimberly_clark",
@@ -30,6 +105,21 @@
       "name": "simmons_foods",
       "ok": true,
       "count": 44
+    },
+    {
+      "name": "fedex",
+      "ok": true,
+      "count": 47
+    },
+    {
+      "name": "amazon",
+      "ok": true,
+      "count": 683
+    },
+    {
+      "name": "jpmorgan_chase",
+      "ok": true,
+      "count": 999
     }
   ]
 }
