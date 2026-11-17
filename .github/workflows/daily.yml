@@ -1,0 +1,55 @@
+name: Daily run
+
+on:
+  schedule:
+    # 11:20 UTC every day. Picked off the hour because GitHub delays jobs
+    # scheduled on it.
+    - cron: "20 11 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+# Never let two runs of the day commit over each other.
+concurrency:
+  group: daily-run
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Call every source and build the data files
+        run: uv run python -m jobwatcher.cli run
+
+      - name: Open today's issue and close yesterday's
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run python -m jobwatcher.cli issue
+
+      # Runs even if the issue step failed, so a day's raw files are never lost.
+      - name: Commit the raw files, the history file and the status file
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+          else
+            git commit -m "Daily run $(date -u +%Y-%m-%d)"
+            git pull --rebase --autostash origin main
+            git push
+          fi
