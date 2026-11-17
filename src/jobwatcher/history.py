@@ -22,6 +22,7 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
+from jobwatcher.mechanical import is_entry_level, is_mechanical
 from jobwatcher.region import region_of
 from jobwatcher.role import in_role
 
@@ -44,6 +45,8 @@ COLUMNS = [
     # Added on top of the required columns, so the ones the project specifies
     # keep the exact order it lists them in.
     "region",
+    "mech_role",
+    "entry_level",
 ]
 
 
@@ -82,6 +85,8 @@ def build_history(days: list[tuple[str, dict[str, list[dict]]]]) -> list[dict]:
                         "title": posting["title"],
                         "location": posting["location"],
                         "region": region_of(posting["location"]),
+                        "mech_role": is_mechanical(posting["title"]),
+                        "entry_level": is_entry_level(posting["title"]),
                         "department": posting["department"],
                         "posted_date": posting["posted_date"],
                         "url": posting["url"],
@@ -99,6 +104,8 @@ def build_history(days: list[tuple[str, dict[str, list[dict]]]]) -> list[dict]:
                 row["title"] = posting["title"]
                 row["location"] = posting["location"]
                 row["region"] = region_of(posting["location"])
+                row["mech_role"] = is_mechanical(posting["title"])
+                row["entry_level"] = is_entry_level(posting["title"])
                 row["department"] = posting["department"]
                 row["posted_date"] = posting["posted_date"]
                 row["url"] = posting["url"]
@@ -131,6 +138,8 @@ def write_history(rows: list[dict], path: Path) -> None:
             out = dict(row)
             out["in_role"] = "true" if row["in_role"] else "false"
             out["first_run"] = "true" if row["first_run"] else "false"
+            out["mech_role"] = "true" if row["mech_role"] else "false"
+            out["entry_level"] = "true" if row["entry_level"] else "false"
             writer.writerow(out)
 
 
@@ -143,4 +152,6 @@ def read_history(path: Path) -> list[dict]:
     for row in rows:
         row["in_role"] = row["in_role"] == "true"
         row["first_run"] = row["first_run"] == "true"
+        row["mech_role"] = row.get("mech_role") == "true"
+        row["entry_level"] = row.get("entry_level") == "true"
     return rows

@@ -58,7 +58,7 @@ uv run pytest                           # the test suite
 
 ## The watch list
 
-Eighteen employers across three applicant tracking systems. Every board returns
+23 employers across three applicant tracking systems. Every board returns
 JSON to a request made with no login; none of them is read as HTML.
 
 | # | Employer | Applicant tracking system | Board |
@@ -78,13 +78,21 @@ JSON to a request made with no login; none of them is read as HTML.
 | 13 | Acxiom | Workday | `acxiomllc.wd5` / `AcxiomUSA` |
 | 14 | Arkansas Children's | Workday | `archildrens.wd1` / `external_career_site` |
 | 15 | University of Arkansas System | Workday | `uasys.wd5` / `UASYS` |
-| 16 | FedEx | Workday | `fedex.wd1` / `FXE-MEISA-External` |
-| 17 | Amazon | Amazon Jobs (in-house) | `amazon.jobs/en/search.json` |
-| 18 | JPMorgan Chase | Oracle Recruiting Cloud | `jpmc.fa.oraclecloud.com` |
+| 16 | Simmons Bank | Workday | `simmonsbank.wd5` / `SimmonsCareers` |
+| 17 | Trane Technologies | Workday | `tranetechnologies.wd12` / `Trane_Technologies_Careers` |
+| 18 | Kimberly-Clark | Workday | `kimberlyclark.wd1` / `GLOBAL` |
+| 19 | Zekelman Industries | Workday | `zekelman.wd12` / `Careers` |
+| 20 | Simmons Foods | Workday | `simmons.wd504` / `Simmons-Careers` |
+| 21 | FedEx | Workday | `fedex.wd1` / `FXE-MEISA-External` |
+| 22 | Amazon | Amazon Jobs (in-house) | `amazon.jobs/en/search.json` |
+| 23 | JPMorgan Chase | Oracle Recruiting Cloud | `jpmc.fa.oraclecloud.com` |
 
-Arkansas Children's and the University of Arkansas System are on the list for
-Little Rock and Northwest Arkansas, which the national employers above barely
-cover on their own.
+Arkansas Children's, the University of Arkansas System and Simmons Bank are on
+the list for Little Rock and Northwest Arkansas, which the national employers
+barely cover on their own. Trane Technologies, Kimberly-Clark, Zekelman
+Industries and Simmons Foods are manufacturers with Arkansas plants; they carry
+the mechanical engineering work the finance-led list does not, which is what
+the For Colton page reads.
 
 The Federal Reserve board is the shared Federal Reserve System one, so the
 St. Louis and Dallas banks both come through that single source.
@@ -184,6 +192,44 @@ ordinary word is never read as a state.
 
 ---
 
+## The mechanical engineering rule
+
+The **For Colton** page watches a different job entirely: mechanical and
+manufacturing engineering in Arkansas, weighted towards internships and
+entry-level roles. It reads the same daily history, filtered on two more title
+rules in `src/jobwatcher/mechanical.py`.
+
+The difficulty is that "engineer" on its own means very little here. These
+boards carry far more software, data and security engineers than mechanical
+ones, so a posting has to **name a mechanical or manufacturing discipline and
+avoid the software wording**:
+
+* **In** — `mechanical`, `mechatronics`, `manufacturing/industrial/process/
+  design/product/project/plant/facilities/maintenance/reliability/controls/
+  automation/robotics/quality/packaging/tooling/welding engineer`,
+  `metallurgy`, `HVAC`, `CAD`, `drafting`, `engineering intern`, `engineering
+  co-op`, `engineering development program`, and a bare `Engineer I`–`V`.
+* **Out** — anything naming `software`, `data engineer`, `cloud`, `devops`,
+  `site reliability`, `network`, `security`, `cyber`, `systems engineer`,
+  `sales/solutions engineer`, `endpoint` and the like.
+* **Also out** — teaching posts (`professor`, `faculty`, `lecturer`), because a
+  professorship in mechanical engineering is not the job being watched, and
+  skilled trades (`technician`, `mechanic`, `tradesman`, `millwright`,
+  `operator`), which sit beside engineering in a plant and share its vocabulary
+  without being engineering roles.
+
+`entry_level` is a separate rule: `intern`, `co-op`, `entry level`, `new grad`,
+`junior`, `associate`, `trainee`, `apprentice`, `early career`, a development
+or rotational program, or `Engineer I`. Anything naming a level above the first
+rung — `senior`, `lead`, `principal`, `staff`, `manager`, `Engineer II` and up —
+is excluded, so "Senior Associate Engineer" does not read as entry level.
+
+Arkansas means the `Northwest Arkansas`, `Little Rock` and `Arkansas` regions.
+A posting a board lists in several places at once ("2 Locations") cannot be
+resolved to a state and so does not appear.
+
+---
+
 ## The data
 
 Two files at fixed paths. The site loads both in the browser and does all the
@@ -211,10 +257,12 @@ One row per posting.
 | `status` | `open` or `removed` |
 | `removed_date` | The day it was marked removed |
 | `region` | The region the location falls in (see below) |
+| `mech_role` | `true` when the title is mechanical engineering work |
+| `entry_level` | `true` when the title reads as entry level, an internship or a co-op |
 
-`region` is the one column beyond what the project asks for. It is appended
-after `removed_date`, so the required columns keep the exact order the project
-lists them in.
+Those last three are the columns beyond what the project asks for. They are
+appended after `removed_date`, so the required columns keep the exact order the
+project lists them in.
 
 Dates are UTC dates written `YYYY-MM-DD`; every run takes the UTC date of the
 moment it runs. A column a source does not provide is left empty for that
@@ -260,6 +308,11 @@ Each loads the two data files and computes everything in the browser.
   days open; a search box matching titles; a sort by first-seen date; an apply
   link on every posting; and a star that saves a posting to a shortlist kept in
   the browser, which survives a reload.
+* **`colton.html` — For Colton.** A second watch on the same history: mechanical
+  and manufacturing engineering openings in Arkansas only, entry level and
+  internships first, with a switch to all levels, filters for employer and area
+  of Arkansas, a title search, and its own shortlist kept separately from the
+  Browse page's.
 * **`market.html` — Market.** Seven sections, each with a heading that states the
   finding, a paragraph explaining it, and a chart: new postings per day (all and
   in role), removed postings per day, open postings per employer, days open with
@@ -288,6 +341,7 @@ be fetched from a CDN for the installed app to work.
 | `src/jobwatcher/adapters/oracle.py` | Reads Oracle Recruiting Cloud boards |
 | `src/jobwatcher/role.py` | The title rule |
 | `src/jobwatcher/region.py` | Turns a board's location text into one region |
+| `src/jobwatcher/mechanical.py` | The mechanical engineering rule and the entry-level rule |
 | `src/jobwatcher/history.py` | First-seen, last-seen and removed logic; reads and writes `history.csv` |
 | `src/jobwatcher/store.py` | Paths on disk and the raw-file reader and writer |
 | `src/jobwatcher/fetch.py` | Calls every source, saves raw files, records each result |
@@ -297,6 +351,7 @@ be fetched from a CDN for the installed app to work.
 | `scripts/make_icons.py` | Generates the app icons the manifest points at |
 | `tests/test_role.py` | Tests for the title rule |
 | `tests/test_region.py` | Tests for the region rule |
+| `tests/test_mechanical.py` | Tests for the mechanical engineering and entry-level rules |
 | `tests/test_fetch.py` | Tests that a failed source is recorded and does not stop the run |
 | `tests/test_normalize.py` | Tests converting each source to the common columns |
 | `tests/test_history.py` | Tests for first-seen, last-seen and removed logic |
@@ -305,6 +360,7 @@ be fetched from a CDN for the installed app to work.
 | `index.html` | The Today page |
 | `browse.html` | The Browse page |
 | `market.html` | The Market page |
+| `colton.html` | The For Colton page |
 | `assets/style.css` | Shared fonts, colors and chrome for all three pages |
 | `assets/data.js` | Loads and parses the two data files; shared page chrome |
 | `assets/charts.js` | The SVG charts, tooltips, legends and table views |

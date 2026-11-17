@@ -224,5 +224,15 @@ def region_of(location: str) -> str:
     return OTHER
 
 
+#: Every region that is inside Arkansas. A posting the board placed in several
+#: states at once ("2 Locations") cannot be resolved and is not counted here.
+ARKANSAS_REGIONS = [NORTHWEST_ARKANSAS, LITTLE_ROCK, "Arkansas"]
+
+
 def is_primary(region: str) -> bool:
     return region in PRIMARY_REGIONS
+
+
+def in_arkansas(region: str) -> bool:
+    """Return True when a region lies inside Arkansas."""
+    return region in ARKANSAS_REGIONS

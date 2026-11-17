@@ -1,7 +1,7 @@
 {
   "name": "Job Watcher",
   "short_name": "Job Watcher",
-  "description": "Daily watch on analyst and early-career openings across 16 employers.",
+  "description": "Daily watch on analyst and early-career openings across 23 employers.",
   "id": "/job-watcher/",
   "start_url": "./index.html",
   "scope": "./",
@@ -9,7 +9,10 @@
   "orientation": "any",
   "background_color": "#f9f9f7",
   "theme_color": "#2a78d6",
-  "categories": ["business", "productivity"],
+  "categories": [
+    "business",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "./assets/icon-192.png",
@@ -31,7 +34,17 @@
     }
   ],
   "shortcuts": [
-    { "name": "Browse openings", "url": "./browse.html" },
-    { "name": "Market report", "url": "./market.html" }
+    {
+      "name": "Browse openings",
+      "url": "./browse.html"
+    },
+    {
+      "name": "Market report",
+      "url": "./market.html"
+    },
+    {
+      "name": "For Colton",
+      "url": "./colton.html"
+    }
   ]
 }

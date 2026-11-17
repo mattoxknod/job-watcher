@@ -129,10 +129,20 @@ export function formatRunTime(value) {
 
 /* ---- loading --------------------------------------------------------- */
 
-/** Turn the two text columns into booleans once, at load. */
+/** Every column the history writes as "true"/"false" text. */
+const BOOLEAN_COLUMNS = ["in_role", "first_run", "mech_role", "entry_level"];
+
+/**
+ * Turn the boolean columns into real booleans once, at load.
+ *
+ * This matters more than it looks: the CSV carries the string "false", and a
+ * non-empty string is truthy in JavaScript, so a column left as text would
+ * read as true on every row.
+ */
 function hydrate(row) {
-  row.in_role = row.in_role === "true";
-  row.first_run = row.first_run === "true";
+  for (const column of BOOLEAN_COLUMNS) {
+    row[column] = row[column] === "true";
+  }
   return row;
 }
 
