@@ -132,6 +132,26 @@ SOURCES = [
         "host": "wd5",
         "site": "AcxiomUSA",
     },
+    # Added for Little Rock and Northwest Arkansas, which the national
+    # employers above barely cover.
+    {
+        "name": "arkansas_childrens",
+        "employer": "Arkansas Children's",
+        "ats": "Workday",
+        "kind": "workday",
+        "tenant": "archildrens",
+        "host": "wd1",
+        "site": "external_career_site",
+    },
+    {
+        "name": "university_of_arkansas",
+        "employer": "University of Arkansas System",
+        "ats": "Workday",
+        "kind": "workday",
+        "tenant": "uasys",
+        "host": "wd5",
+        "site": "UASYS",
+    },
     {
         "name": "fedex",
         "employer": "FedEx",
