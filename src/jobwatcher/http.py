@@ -10,6 +10,7 @@ out a 429 properly, honouring ``Retry-After`` when the server sends one.
 from __future__ import annotations
 
 import random
+import threading
 import time
 from urllib.parse import urlsplit
 
@@ -37,7 +38,17 @@ MAX_SLEEP = 120.0
 #: Minimum gap between two requests to the same host.
 MIN_INTERVAL = 0.45
 
+#: Sources are read in parallel, so the per-host gap is shared state. Each host
+#: gets its own lock: two sources on the same host wait for each other, while
+#: sources on different hosts never block one another.
 _last_call: dict[str, float] = {}
+_host_locks: dict[str, threading.Lock] = {}
+_locks_guard = threading.Lock()
+
+
+def _host_lock(host: str) -> threading.Lock:
+    with _locks_guard:
+        return _host_locks.setdefault(host, threading.Lock())
 
 
 class FetchError(RuntimeError):
@@ -47,13 +58,14 @@ class FetchError(RuntimeError):
 def _throttle(url: str) -> None:
     """Hold off until this host's minimum gap has passed."""
     host = urlsplit(url).netloc
-    previous = _last_call.get(host)
-    now = time.monotonic()
-    if previous is not None:
-        wait = MIN_INTERVAL - (now - previous)
-        if wait > 0:
-            time.sleep(wait)
-    _last_call[host] = time.monotonic()
+    with _host_lock(host):
+        previous = _last_call.get(host)
+        now = time.monotonic()
+        if previous is not None:
+            wait = MIN_INTERVAL - (now - previous)
+            if wait > 0:
+                time.sleep(wait)
+        _last_call[host] = time.monotonic()
 
 
 def _retry_after(response) -> float | None:

@@ -72,10 +72,10 @@ def test_a_board_that_returns_nothing_counts_as_a_failed_read(monkeypatch, tmp_p
 def test_one_failing_source_does_not_stop_the_run(monkeypatch, tmp_path):
     from jobwatcher.adapters import workday
 
-    calls = []
+    calls = set()
 
     def fetch(source):
-        calls.append(source["name"])
+        calls.add(source["name"])
         if source["name"] == "bad":
             raise FetchError("boom")
         return {"total": 1, "jobPostings": [POSTING]}
@@ -88,7 +88,9 @@ def test_one_failing_source_does_not_stop_the_run(monkeypatch, tmp_path):
     ]
     log = fetch_mod.run(sources, "2026-11-17", tmp_path)
 
-    assert calls == ["bad", "good"]
+    # Sources are read in parallel, so which one finishes first is not fixed;
+    # what matters is that the failure did not stop the other one.
+    assert calls == {"bad", "good"}
     assert [s["ok"] for s in log["sources"]] == [False, True]
 
     # Every source's result, success or failure, is written down.
@@ -96,3 +98,17 @@ def test_one_failing_source_does_not_stop_the_run(monkeypatch, tmp_path):
         (store.day_dir("2026-11-17", tmp_path) / store.RUN_LOG).read_text()
     )
     assert {s["name"] for s in written["sources"]} == {"bad", "good"}
+
+
+def test_the_run_log_follows_the_watch_list_order(monkeypatch, tmp_path):
+    """Parallel reads must not reorder the run log between runs."""
+    from jobwatcher.adapters import workday
+
+    monkeypatch.setattr(
+        workday, "fetch", lambda source: {"total": 1, "jobPostings": [POSTING]}
+    )
+
+    sources = [{**SOURCE, "name": name} for name in ("zeta", "alpha", "mid")]
+    log = fetch_mod.run(sources, "2026-11-17", tmp_path)
+
+    assert [s["name"] for s in log["sources"]] == ["zeta", "alpha", "mid"]

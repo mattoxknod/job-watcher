@@ -107,6 +107,12 @@ recorded as a failed source for that day rather than being written out
 half-read, because a partial read would look like every missing posting had
 been removed.
 
+For the same reason, a board that answers cleanly but lists no postings at all
+is treated as a failed read rather than as an employer with nothing open. Every
+board here always has openings, so an empty response means something changed on
+their end — a renamed site, a board moved behind a login — and writing it out
+would mark all of that source's postings removed in one day.
+
 ---
 
 ## The title rule
