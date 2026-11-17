@@ -22,6 +22,7 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
+from jobwatcher.region import region_of
 from jobwatcher.role import in_role
 
 COLUMNS = [
@@ -40,6 +41,9 @@ COLUMNS = [
     "last_seen",
     "status",
     "removed_date",
+    # Added on top of the required columns, so the ones the project specifies
+    # keep the exact order it lists them in.
+    "region",
 ]
 
 
@@ -77,6 +81,7 @@ def build_history(days: list[tuple[str, dict[str, list[dict]]]]) -> list[dict]:
                         "employer": posting["employer"],
                         "title": posting["title"],
                         "location": posting["location"],
+                        "region": region_of(posting["location"]),
                         "department": posting["department"],
                         "posted_date": posting["posted_date"],
                         "url": posting["url"],
@@ -93,6 +98,7 @@ def build_history(days: list[tuple[str, dict[str, list[dict]]]]) -> list[dict]:
                 # seen today, and reopen it if it had been removed.
                 row["title"] = posting["title"]
                 row["location"] = posting["location"]
+                row["region"] = region_of(posting["location"])
                 row["department"] = posting["department"]
                 row["posted_date"] = posting["posted_date"]
                 row["url"] = posting["url"]

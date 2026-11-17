@@ -175,3 +175,24 @@ def test_a_source_that_lists_nothing_still_removes_its_postings():
     ]))
     assert rows["acme:1"]["status"] == "removed"
     assert rows["acme:1"]["removed_date"] == "2026-11-02"
+
+
+def test_region_is_set_from_the_location():
+    rows = rows_by_id(build_history([
+        ("2026-11-01", {"acme": [
+            posting("1", location="Bentonville, AR"),
+            posting("2", location="Dallas, TX"),
+            posting("3", location="Little Rock, AR"),
+        ]}),
+    ]))
+    assert rows["acme:1"]["region"] == "Northwest Arkansas"
+    assert rows["acme:2"]["region"] == "Dallas-Fort Worth"
+    assert rows["acme:3"]["region"] == "Little Rock"
+
+
+def test_a_moved_posting_gets_its_new_region():
+    rows = rows_by_id(build_history([
+        ("2026-11-01", {"acme": [posting("1", location="Houston, TX")]}),
+        ("2026-11-02", {"acme": [posting("1", location="Dallas, TX")]}),
+    ]))
+    assert rows["acme:1"]["region"] == "Dallas-Fort Worth"
