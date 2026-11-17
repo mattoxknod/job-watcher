@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Today · Job Watcher</title>
+<meta name="description" content="What changed today across the analyst job boards this tool watches.">
+<meta name="theme-color" content="#2a78d6">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./assets/icon-192.png">
+<link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="brand">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+        <rect x="2" y="11" width="3.4" height="7" rx="1.3" fill="#2a78d6"/>
+        <rect x="8.3" y="6" width="3.4" height="12" rx="1.3" fill="#2a78d6"/>
+        <rect x="14.6" y="2" width="3.4" height="16" rx="1.3" fill="#eb6834"/>
+      </svg>
+      Job Watcher
+    </span>
+    <nav class="nav">
+      <a href="index.html">Today</a>
+      <a href="browse.html">Browse</a>
+      <a href="market.html">Market</a>
+    </nav>
+    <span class="offline-flag">Offline — showing last loaded data</span>
+  </div>
+</header>
+
+<main>
+  <h1>Today</h1>
+  <p class="sub" id="runline">Loading…</p>
+
+  <div id="page">
+    <p class="loading">Loading the history and status files…</p>
+  </div>
+</main>
+
+<footer>
+  Built from <code>data/history.csv</code> and <code>data/status.json</code>, both
+  read and totalled in the browser.
+</footer>
+
+<script type="module">
+import {
+  loadData, initChrome, showError, formatRunTime, formatDate, lastRunDate,
+} from "./assets/data.js";
+import { esc } from "./assets/charts.js";
+
+initChrome();
+
+const page = document.getElementById("page");
+const runline = document.getElementById("runline");
+
+/** One posting as a list item, with a link to apply. */
+function postingItem(row) {
+  const meta = [row.employer, row.location, row.department]
+    .filter(Boolean)
+    .map((part) => `<span>${esc(part)}</span>`)
+    .join("");
+
+  return `
+    <li class="posting">
+      <div class="body">
+        <a class="title" href="${esc(row.url)}" target="_blank" rel="noopener">${esc(row.title || "(untitled)")}</a>
+        <div class="meta">${meta}</div>
+      </div>
+      ${row.in_role ? '<span class="pill role">In role</span>' : ""}
+      <a class="apply" href="${esc(row.url)}" target="_blank" rel="noopener">Apply</a>
+    </li>`;
+}
+
+function listSection(heading, rows, emptyText) {
+  // In-role postings first, then the rest.
+  const sorted = [...rows].sort(
+    (a, b) =>
+      Number(b.in_role) - Number(a.in_role) ||
+      a.employer.localeCompare(b.employer) ||
+      a.title.localeCompare(b.title),
+  );
+  const body = sorted.length
+    ? `<ul class="postings">${sorted.map(postingItem).join("")}</ul>`
+    : `<p class="empty">${esc(emptyText)}</p>`;
+  return `
+    <section class="card">
+      <h2>${esc(heading)} <span style="color:var(--muted);font-weight:500">(${rows.length})</span></h2>
+      ${body}
+    </section>`;
+}
+
+function tile(label, value) {
+  return `<div class="tile"><div class="label">${esc(label)}</div><div class="value">${esc(value)}</div></div>`;
+}
+
+function sourceChip(source) {
+  return `
+    <div class="source ${source.ok ? "ok" : "bad"}">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="nm">${esc(source.name)}</span>
+      <span class="ct">${source.ok ? `${source.count}` : "failed"}</span>
+    </div>`;
+}
+
+try {
+  const { history, status } = await loadData();
+  const runDate = lastRunDate(history);
+
+  runline.textContent =
+    `Last run ${formatRunTime(status.run_time)} · watching since ` +
+    `${formatDate(status.first_run_date)}`;
+
+  // The two lists come from the history file, so they always agree with it.
+  const newToday = history.filter((r) => r.first_seen === runDate && !r.first_run);
+  const removedToday = history.filter((r) => r.removed_date === runDate);
+
+  const ok = status.sources.filter((s) => s.ok).length;
+
+  page.innerHTML = `
+    <div class="tiles">
+      ${tile("Days with a successful run", status.days_with_success)}
+      ${tile("Open postings", status.open)}
+      ${tile("New today", status.new_today)}
+      ${tile("Removed today", status.removed_today)}
+    </div>
+
+    <section class="card">
+      <h2>Sources <span style="color:var(--muted);font-weight:500">(${ok}/${status.sources.length} read)</span></h2>
+      <p class="finding">
+        Every source is called on its own. One board failing does not stop the
+        run, and a board that failed is left alone rather than treated as having
+        dropped its postings.
+      </p>
+      <div class="sources">${status.sources.map(sourceChip).join("")}</div>
+    </section>
+
+    ${listSection("New postings in the latest run", newToday, "No new postings in the latest run.")}
+    ${listSection("Removed postings in the latest run", removedToday, "No postings removed in the latest run.")}
+  `;
+} catch (error) {
+  runline.textContent = "";
+  showError(page, error);
+}
+</script>
+
+</body>
+</html>
