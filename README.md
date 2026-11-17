@@ -321,6 +321,16 @@ Each loads the two data files and computes everything in the browser.
   Postings with `first_run` set are left out of the definitions that need a real
   start date.
 
+A button in the navigation bar cycles the theme between **matching your
+system** (the default), **light** and **dark**. The choice is kept in the
+browser and applies across all four pages. Both palettes are chosen rather than
+flipped: the stylesheet defines light on bare `:root`, redefines the tokens for
+dark under `prefers-color-scheme`, and again under `[data-theme="dark"]` so the
+button wins in both directions — picking light on a machine set to dark works,
+not just the other way round. A tiny inline script in each page's `<head>`
+stamps the saved theme before the first paint, because a module script runs too
+late to stop the other theme flashing first.
+
 The site is installable: it has a web app manifest and a service worker, and
 installs from the browser as an app. Online, the pages load the data files from
 the network; offline, the site still opens and shows the last data it loaded.

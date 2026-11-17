@@ -10,6 +10,19 @@
 <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./assets/icon-192.png">
 <link rel="stylesheet" href="./assets/style.css">
+<script>
+/* Stamp the saved theme before the first paint, so a reader who chose a theme
+   never sees the other one flash first. Kept inline and tiny on purpose: a
+   deferred module would run too late to prevent that flash. */
+(function () {
+  try {
+    var t = localStorage.getItem("jobwatcher.theme");
+    if (t === "light" || t === "dark") {
+      document.documentElement.setAttribute("data-theme", t);
+    }
+  } catch (e) {}
+})();
+</script>
 </head>
 <body>
 
@@ -30,6 +43,8 @@
       <a href="colton.html">For Colton</a>
     </nav>
     <span class="offline-flag">Offline — showing last loaded data</span>
+    <button class="theme-toggle" id="theme-toggle" type="button"
+            title="Theme" aria-label="Change theme"></button>
   </div>
 </header>
 

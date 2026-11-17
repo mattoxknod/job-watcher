@@ -124,6 +124,32 @@ body {
 
 body.is-offline .offline-flag { display: inline-block; }
 
+/* ---- theme toggle ---------------------------------------------------- */
+
+.theme-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--page);
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.theme-toggle:hover { color: var(--text); border-color: var(--axis); }
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+}
+
+.theme-toggle svg { display: block; }
+
 /* ---- layout ---------------------------------------------------------- */
 
 main {

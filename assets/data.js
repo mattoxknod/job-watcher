@@ -217,8 +217,99 @@ export function countBy(rows, key) {
 
 /* ---- shared page chrome --------------------------------------------- */
 
+/* ---- theme ----------------------------------------------------------- */
+
+const THEME_STORE = "jobwatcher.theme";
+
+//: "system" follows the operating system, which is the default. The other two
+//: stamp data-theme on the root element, which the stylesheet honours over the
+//: prefers-color-scheme media query in both directions.
+const THEMES = ["system", "light", "dark"];
+
+const THEME_ICONS = {
+  // A half-filled circle for "follows your system".
+  system:
+    '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/>' +
+    '<path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor"/>',
+  light:
+    '<circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/>' +
+    '<path d="M12 2.5v2.4M12 19.1v2.4M4.2 12H1.8M22.2 12h-2.4M6.5 6.5 4.8 4.8' +
+    'M19.2 19.2l-1.7-1.7M17.5 6.5l1.7-1.7M4.8 19.2l1.7-1.7" ' +
+    'stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  dark:
+    '<path d="M20.5 13.2A8.6 8.6 0 1 1 10.8 3.5a6.8 6.8 0 0 0 9.7 9.7Z" ' +
+    'fill="currentColor"/>',
+};
+
+const THEME_LABELS = {
+  system: "Theme: matching your system. Switch to light.",
+  light: "Theme: light. Switch to dark.",
+  dark: "Theme: dark. Switch to your system setting.",
+};
+
+//: The page background each theme paints, so the browser chrome matches.
+const THEME_COLORS = { light: "#f9f9f7", dark: "#0d0d0d" };
+
+export function readTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_STORE);
+    return THEMES.includes(saved) ? saved : "system";
+  } catch {
+    return "system";
+  }
+}
+
+/** Which of light or dark a theme actually paints right now. */
+export function resolvedTheme(theme) {
+  if (theme === "light" || theme === "dark") return theme;
+  return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+export function applyTheme(theme) {
+  const root = document.documentElement;
+  if (theme === "system") delete root.dataset.theme;
+  else root.dataset.theme = theme;
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", THEME_COLORS[resolvedTheme(theme)]);
+}
+
+function initTheme() {
+  let theme = readTheme();
+  applyTheme(theme);
+
+  const button = document.getElementById("theme-toggle");
+  if (!button) return;
+
+  const paint = () => {
+    button.innerHTML =
+      `<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">${THEME_ICONS[theme]}</svg>`;
+    button.title = THEME_LABELS[theme];
+    button.setAttribute("aria-label", THEME_LABELS[theme]);
+  };
+  paint();
+
+  button.addEventListener("click", () => {
+    theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+    try {
+      localStorage.setItem(THEME_STORE, theme);
+    } catch {
+      /* The choice just will not survive a reload. */
+    }
+    applyTheme(theme);
+    paint();
+  });
+
+  // While following the system, track it changing under us.
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (theme === "system") applyTheme(theme);
+  });
+}
+
 /** Mark the current page in the nav and show the offline flag. */
 export function initChrome() {
+  initTheme();
+
   const here = location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".nav a").forEach((link) => {
     const target = link.getAttribute("href");
