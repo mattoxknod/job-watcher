@@ -15,7 +15,7 @@
 //: Bump on every deploy that changes a page, stylesheet or script. Activating
 //: a new version clears the old shell, so an installed app picks the change up
 //: instead of serving yesterday's page from cache.
-const VERSION = "v2";
+const VERSION = "v3";
 const SHELL_CACHE = `job-watcher-shell-${VERSION}`;
 
 //: Deliberately not versioned. The data cache is the offline copy of the two

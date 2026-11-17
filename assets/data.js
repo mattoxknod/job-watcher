@@ -225,6 +225,17 @@ export function initChrome() {
   addEventListener("offline", paint);
 
   if ("serviceWorker" in navigator) {
+    // A new service worker takes over as soon as it installs, which means the
+    // page being read was served from the previous version's cache. Reloading
+    // once on handover swaps it for the deployed one, so a visit after a
+    // deploy never leaves someone looking at the old page.
+    let reloading = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (reloading) return;
+      reloading = true;
+      location.reload();
+    });
+
     addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(() => {
         /* The pages work without it; only offline support is lost. */
