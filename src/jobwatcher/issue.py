@@ -19,6 +19,15 @@ from jobwatcher.store import HISTORY_CSV
 
 API = "https://api.github.com"
 
+#: GitHub refuses an issue body over 65,536 characters with a 422. A busy day
+#: across these boards moves well over a thousand postings, which at a link
+#: each is several times that, so the lists are capped and the overflow is
+#: counted instead. The site shows the full lists.
+BODY_LIMIT = 60000
+
+#: Most postings to list in one section before summarising the rest.
+MAX_PER_SECTION = 150
+
 
 def _link(row: dict) -> str:
     employer = row["employer"] or row["source"]
@@ -32,16 +41,32 @@ def _link(row: dict) -> str:
     return f"- {label}{tail}{role}"
 
 
-def _section(heading: str, rows: list[dict], empty: str) -> list[str]:
+def _section(heading: str, rows: list[dict], empty: str,
+             limit: int = MAX_PER_SECTION) -> list[str]:
     lines = [f"## {heading} ({len(rows)})", ""]
     if not rows:
         lines += [empty, ""]
         return lines
-    in_role = [r for r in rows if r["in_role"]]
-    other = [r for r in rows if not r["in_role"]]
-    for group in (in_role, other):
-        for row in sorted(group, key=lambda r: (r["employer"], r["title"])):
-            lines.append(_link(row))
+
+    # In-role postings are listed first, so whatever the cap cuts is always
+    # the least relevant part of the list.
+    in_role = sorted(
+        (r for r in rows if r["in_role"]), key=lambda r: (r["employer"], r["title"])
+    )
+    other = sorted(
+        (r for r in rows if not r["in_role"]), key=lambda r: (r["employer"], r["title"])
+    )
+    ordered = in_role + other
+
+    for row in ordered[:limit]:
+        lines.append(_link(row))
+
+    hidden = len(ordered) - limit
+    if hidden > 0:
+        lines += [
+            "",
+            f"_…and {hidden} more. The full list is on the site._",
+        ]
     lines.append("")
     return lines
 
@@ -74,9 +99,20 @@ def render_body(rows: list[dict], status: dict) -> str:
         lines += [f"- `{s['name']}`" for s in failed]
         lines.append("")
 
-    lines += _section("New postings", new_rows, "No new postings today.")
-    lines += _section("Removed postings", removed_rows, "No postings removed today.")
-    return "\n".join(lines).rstrip() + "\n"
+    # Fit inside GitHub's limit: shrink the per-section cap until the whole
+    # body fits, rather than letting the API reject the issue outright.
+    limit = MAX_PER_SECTION
+    while True:
+        body = "\n".join(
+            lines
+            + _section("New postings", new_rows, "No new postings today.", limit)
+            + _section(
+                "Removed postings", removed_rows, "No postings removed today.", limit
+            )
+        ).rstrip() + "\n"
+        if len(body) <= BODY_LIMIT or limit == 0:
+            return body
+        limit = 0 if limit <= 10 else limit // 2
 
 
 def _latest_date(rows: list[dict]) -> str:
