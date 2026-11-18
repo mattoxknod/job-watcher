@@ -1,0 +1,41 @@
+{
+  "run_date": "2026-11-18",
+  "run_time": "2026-11-18T04:05:57+00:00",
+  "sources": [
+    {
+      "count": 1186,
+      "employer": "State Street",
+      "error": "",
+      "name": "state_street",
+      "ok": true
+    },
+    {
+      "count": 280,
+      "employer": "BlackRock",
+      "error": "",
+      "name": "blackrock",
+      "ok": true
+    },
+    {
+      "count": 84,
+      "employer": "Ally Financial",
+      "error": "",
+      "name": "ally",
+      "ok": true
+    },
+    {
+      "count": 377,
+      "employer": "General Mills",
+      "error": "",
+      "name": "general_mills",
+      "ok": true
+    },
+    {
+      "count": 551,
+      "employer": "Smithfield Foods",
+      "error": "",
+      "name": "smithfield",
+      "ok": true
+    }
+  ]
+}

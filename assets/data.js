@@ -147,9 +147,20 @@ function hydrate(row) {
 }
 
 export async function loadData() {
+  // The logo manifest rides along so logoHtml is ready before the first
+  // render. A missing manifest is not an error; every company just shows
+  // its initials.
+  const logos = fetch("./assets/logos/index.json")
+    .then((r) => (r.ok ? r.json() : {}))
+    .then((files) => {
+      LOGO_FILES = files || {};
+    })
+    .catch(() => {});
+
   const [historyRes, statusRes] = await Promise.all([
     fetch(DATA.history, { cache: "no-cache" }),
     fetch(DATA.status, { cache: "no-cache" }),
+    logos,
   ]);
 
   if (!historyRes.ok) throw new Error(`history.csv: ${historyRes.status}`);
@@ -213,6 +224,51 @@ export function countBy(rows, key) {
   return [...counts.entries()]
     .map(([label, value]) => ({ label, value }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+}
+
+/* ---- company logos --------------------------------------------------- */
+
+//: Words that say nothing about which company this is.
+const NOISE = /^(the|of|and|a|inc|llc|co|corp|corporation|company|group|system|systems|services|industries|financial|foods|bank|technologies)$/i;
+
+/** Initials to fall back on when a company has no logo file. */
+export function initials(employer) {
+  const words = String(employer || "")
+    .replace(/[^A-Za-z0-9 ]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  const meaningful = words.filter((w) => !NOISE.test(w));
+  const use = meaningful.length ? meaningful : words;
+  if (!use.length) return "?";
+  if (use.length === 1) return use[0].slice(0, 2).toUpperCase();
+  return (use[0][0] + use[1][0]).toUpperCase();
+}
+
+//: source name -> logo filename, from assets/logos/index.json. Filled by
+//: loadData before anything renders.
+let LOGO_FILES = {};
+
+/**
+ * A company's logo, or its initials when there is no logo for it.
+ *
+ * The logos are files in the repository rather than calls to a logo service,
+ * so the installed app still shows them offline and no third party learns
+ * which companies are being looked at. The manifest is what makes the
+ * fallback silent: without it every company lacking a logo would fire a 404
+ * on every page load.
+ */
+export function logoHtml(sourceName, employer) {
+  const file = LOGO_FILES[sourceName];
+  if (!file) {
+    return (
+      `<span class="logo-fallback" aria-hidden="true">` +
+      `${initials(employer)}</span>`
+    );
+  }
+  return (
+    `<img class="logo" src="./assets/logos/${file}" alt="" ` +
+    `loading="lazy" data-initials="${initials(employer)}">`
+  );
 }
 
 /* ---- shared page chrome --------------------------------------------- */
@@ -309,6 +365,25 @@ function initTheme() {
 /** Mark the current page in the nav and show the offline flag. */
 export function initChrome() {
   initTheme();
+
+  // A missing logo file becomes the company's initials. Error events do not
+  // bubble, so this listens on the way down and covers every logo on the
+  // page, including ones rendered later.
+  document.addEventListener(
+    "error",
+    (event) => {
+      const img = event.target;
+      if (!(img instanceof HTMLImageElement) || !img.classList.contains("logo")) {
+        return;
+      }
+      const badge = document.createElement("span");
+      badge.className = "logo-fallback";
+      badge.setAttribute("aria-hidden", "true");
+      badge.textContent = img.dataset.initials || "?";
+      img.replaceWith(badge);
+    },
+    true,
+  );
 
   const here = location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".nav a").forEach((link) => {

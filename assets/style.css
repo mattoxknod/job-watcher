@@ -253,6 +253,159 @@ section + section { margin-top: 22px; }
 .source .nm { font-weight: 550; }
 .source .ct { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
 
+/* ---- map ------------------------------------------------------------- */
+
+/* A sequential one-hue ramp, stepped for each surface rather than flipped.
+   On light, more postings read darker; on dark, more postings read brighter,
+   which is the same idea pointed the only way each background allows. */
+:root {
+  --map-empty: #ececE6;
+  --map-1: #cde2fb;
+  --map-2: #9ec5f4;
+  --map-3: #5598e7;
+  --map-4: #2a78d6;
+  --map-5: #184f95;
+  --map-stroke: #fcfcfb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --map-empty: #232322;
+    --map-1: #104281;
+    --map-2: #1c5cab;
+    --map-3: #2a78d6;
+    --map-4: #5598e7;
+    --map-5: #9ec5f4;
+    --map-stroke: #1a1a19;
+  }
+}
+
+:root[data-theme="dark"] {
+  --map-empty: #232322;
+  --map-1: #104281;
+  --map-2: #1c5cab;
+  --map-3: #2a78d6;
+  --map-4: #5598e7;
+  --map-5: #9ec5f4;
+  --map-stroke: #1a1a19;
+}
+
+.map-wrap { width: 100%; }
+.map-wrap svg { display: block; width: 100%; height: auto; }
+
+.state {
+  stroke: var(--map-stroke);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill 120ms ease;
+}
+
+.state[data-bin="0"] { fill: var(--map-empty); cursor: default; }
+.state[data-bin="1"] { fill: var(--map-1); }
+.state[data-bin="2"] { fill: var(--map-2); }
+.state[data-bin="3"] { fill: var(--map-3); }
+.state[data-bin="4"] { fill: var(--map-4); }
+.state[data-bin="5"] { fill: var(--map-5); }
+
+.state:hover { stroke: var(--text); stroke-width: 1.4; }
+
+.state:focus-visible {
+  outline: none;
+  stroke: var(--text);
+  stroke-width: 2;
+}
+
+.state[aria-pressed="true"] {
+  stroke: var(--text);
+  stroke-width: 2.2;
+}
+
+.inset-frame {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.inset-label {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.ramp { display: flex; gap: 2px; }
+
+.ramp i {
+  width: 34px;
+  height: 11px;
+  border-radius: 2px;
+  display: block;
+}
+
+.ramp i[data-bin="0"] { background: var(--map-empty); }
+.ramp i[data-bin="1"] { background: var(--map-1); }
+.ramp i[data-bin="2"] { background: var(--map-2); }
+.ramp i[data-bin="3"] { background: var(--map-3); }
+.ramp i[data-bin="4"] { background: var(--map-4); }
+.ramp i[data-bin="5"] { background: var(--map-5); }
+
+.map-aside {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* ---- company logos --------------------------------------------------- */
+
+.logo {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  /* Always white, in both themes. Company marks are drawn for a white page,
+     and several of these are dark or monochrome: on the dark surface they
+     would disappear into it. */
+  background: #fff;
+  object-fit: contain;
+  padding: 3px;
+}
+
+.logo-fallback {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--page);
+  color: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.source .logo, .source .logo-fallback {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  font-size: 9px;
+  padding: 2px;
+}
+
 /* ---- posting lists --------------------------------------------------- */
 
 .postings { list-style: none; margin: 0; padding: 0; }

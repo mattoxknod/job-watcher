@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map · Job Watcher</title>
+<meta name="description" content="Open postings by state, on a map you can click.">
+<meta name="theme-color" content="#2a78d6">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./assets/icon-192.png">
+<link rel="stylesheet" href="./assets/style.css">
+<script>
+/* Stamp the saved theme before the first paint, so a reader who chose a theme
+   never sees the other one flash first. Kept inline and tiny on purpose: a
+   deferred module would run too late to prevent that flash. */
+(function () {
+  try {
+    var t = localStorage.getItem("jobwatcher.theme");
+    if (t === "light" || t === "dark") {
+      document.documentElement.setAttribute("data-theme", t);
+    }
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="brand">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+        <rect x="2" y="11" width="3.4" height="7" rx="1.3" fill="#2a78d6"/>
+        <rect x="8.3" y="6" width="3.4" height="12" rx="1.3" fill="#2a78d6"/>
+        <rect x="14.6" y="2" width="3.4" height="16" rx="1.3" fill="#eb6834"/>
+      </svg>
+      Job Watcher
+    </span>
+    <nav class="nav">
+      <a href="index.html">Today</a>
+      <a href="browse.html">Browse</a>
+      <a href="map.html">Map</a>
+      <a href="market.html">Market</a>
+      <a href="colton.html">For Colton</a>
+    </nav>
+    <span class="offline-flag">Offline — showing last loaded data</span>
+    <button class="theme-toggle" id="theme-toggle" type="button"
+            title="Theme" aria-label="Change theme"></button>
+  </div>
+</header>
+
+<main>
+  <h1>Map</h1>
+  <p class="sub" id="asof">Loading…</p>
+
+  <section class="card">
+    <div class="controls" id="controls" hidden>
+      <div class="field">
+        <label for="scope">Count</label>
+        <div class="segmented" id="scope" role="group" aria-label="Which postings to count">
+          <button type="button" data-scope="role" aria-pressed="true">In my role</button>
+          <button type="button" data-scope="all" aria-pressed="false">All postings</button>
+          <button type="button" data-scope="mech" aria-pressed="false">Mechanical</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="state-select">Jump to a state</label>
+        <select id="state-select"><option value="">Choose a state…</option></select>
+      </div>
+    </div>
+
+    <div class="map-wrap" id="map">
+      <p class="loading">Loading the map…</p>
+    </div>
+
+    <div class="map-legend" id="legend" hidden></div>
+    <p class="map-aside" id="aside"></p>
+  </section>
+
+  <div id="detail"></div>
+</main>
+
+<footer>
+  Albers equal-area projection, with Alaska, Hawaii and Puerto Rico drawn as
+  insets. Equal-area matters on a map coloured by counts: a projection that
+  inflated the northern states would overstate them.
+</footer>
+
+<script type="module">
+import {
+  loadData, initChrome, showError, formatDate, lastRunDate, isOpen, daysOpen,
+  logoHtml,
+} from "./assets/data.js";
+import { esc } from "./assets/charts.js";
+
+initChrome();
+
+const mapHost = document.getElementById("map");
+const detail = document.getElementById("detail");
+const legend = document.getElementById("legend");
+const aside = document.getElementById("aside");
+const controls = document.getElementById("controls");
+const asof = document.getElementById("asof");
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+const state = { scope: "role", selected: "" };
+
+let open = [];
+let runDate = "";
+let geo = null;
+let counts = new Map();
+let bins = [];
+
+/* ---- counting -------------------------------------------------------- */
+
+function inScope(row) {
+  if (state.scope === "role") return row.in_role;
+  if (state.scope === "mech") return row.mech_role;
+  return true;
+}
+
+function recount() {
+  counts = new Map();
+  for (const row of open) {
+    if (!row.state || !inScope(row)) continue;
+    counts.set(row.state, (counts.get(row.state) || 0) + 1);
+  }
+
+  // Quantile breaks over the states that actually have postings. An even
+  // split would put almost every state in the lightest band, because a few
+  // states hold most of the openings.
+  const values = [...counts.values()].filter((v) => v > 0).sort((a, b) => a - b);
+  bins = [];
+  if (values.length) {
+    for (let i = 1; i <= 5; i += 1) {
+      const at = values[Math.min(values.length - 1, Math.floor((values.length * i) / 5) - 1)];
+      if (!bins.length || at > bins[bins.length - 1]) bins.push(at);
+    }
+  }
+}
+
+/** Which colour band a count falls in: 0 is "none". */
+function binOf(count) {
+  if (!count) return 0;
+  for (let i = 0; i < bins.length; i += 1) {
+    if (count <= bins[i]) return i + 1;
+  }
+  return bins.length || 1;
+}
+
+/* ---- the map --------------------------------------------------------- */
+
+function drawMap() {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${geo.width} ${geo.height}`);
+  svg.setAttribute("role", "group");
+  svg.setAttribute("aria-label", "Open postings by state");
+
+  for (const [code, shape] of Object.entries(geo.states)) {
+    const count = counts.get(code) || 0;
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("d", shape.d);
+    path.setAttribute("class", "state");
+    path.setAttribute("data-bin", String(binOf(count)));
+    path.setAttribute("data-code", code);
+    path.setAttribute("role", "button");
+    path.setAttribute("tabindex", count ? "0" : "-1");
+    path.setAttribute("aria-pressed", String(state.selected === code));
+    path.setAttribute(
+      "aria-label",
+      `${shape.name}: ${count} ${count === 1 ? "posting" : "postings"}`,
+    );
+
+    const title = document.createElementNS(SVG_NS, "title");
+    title.textContent = `${shape.name} — ${count} ${count === 1 ? "posting" : "postings"}`;
+    path.append(title);
+
+    if (count) {
+      path.addEventListener("click", () => select(code));
+      path.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          select(code);
+        }
+      });
+    }
+    svg.append(path);
+  }
+
+  // Name the insets, so nobody has to guess why three shapes sit in a corner.
+  for (const [code, label] of [["AK", "Alaska"], ["HI", "Hawaii"], ["PR", "Puerto Rico"]]) {
+    const shape = geo.states[code];
+    if (!shape) continue;
+    const text = document.createElementNS(SVG_NS, "text");
+    text.setAttribute("class", "inset-label");
+    text.setAttribute("x", shape.cx);
+    text.setAttribute("y", code === "AK" ? shape.cy + 74 : shape.cy + 28);
+    text.setAttribute("text-anchor", "middle");
+    text.textContent = label;
+    svg.append(text);
+  }
+
+  mapHost.innerHTML = "";
+  mapHost.append(svg);
+}
+
+function drawLegend() {
+  const labels = ["none"];
+  let low = 1;
+  for (const high of bins) {
+    labels.push(low === high ? `${low}` : `${low}–${high}`);
+    low = high + 1;
+  }
+
+  legend.hidden = false;
+  legend.innerHTML =
+    `<span>Open postings</span><span class="ramp">` +
+    labels.map((_, i) => `<i data-bin="${i}"></i>`).join("") +
+    `</span>` +
+    labels.map((l) => `<span>${esc(l)}</span>`).join(" ");
+}
+
+/* ---- the selected state ---------------------------------------------- */
+
+function postingItem(row) {
+  const days = daysOpen(row, runDate);
+  const meta = [
+    row.employer,
+    row.location,
+    row.department,
+    `First seen ${formatDate(row.first_seen)}`,
+    days === null ? "" : `${days} ${days === 1 ? "day" : "days"} open`,
+  ]
+    .filter(Boolean)
+    .map((part) => `<span>${esc(part)}</span>`)
+    .join("");
+
+  return `
+    <li class="posting">
+      ${logoHtml(row.source, row.employer)}
+      <div class="body">
+        <a class="title" href="${esc(row.url)}" target="_blank" rel="noopener">${esc(row.title || "(untitled)")}</a>
+        <div class="meta">${meta}</div>
+      </div>
+      ${row.in_role ? '<span class="pill role">In role</span>' : ""}
+      <a class="apply" href="${esc(row.url)}" target="_blank" rel="noopener">Apply</a>
+    </li>`;
+}
+
+const SCOPE_WORDS = {
+  role: "in my role",
+  all: "in total",
+  mech: "in mechanical engineering",
+};
+
+function renderDetail() {
+  if (!state.selected) {
+    detail.innerHTML =
+      `<section class="card"><p class="empty">Pick a state on the map to see what is open there.</p></section>`;
+    return;
+  }
+
+  const code = state.selected;
+  const name = geo.states[code] ? geo.states[code].name : code;
+  const rows = open
+    .filter((r) => r.state === code && inScope(r))
+    .sort(
+      (a, b) =>
+        Number(b.in_role) - Number(a.in_role) ||
+        b.first_seen.localeCompare(a.first_seen) ||
+        a.employer.localeCompare(b.employer),
+    );
+
+  // Long lists are capped: this is a map, not the Browse page.
+  const CAP = 60;
+  const shown = rows.slice(0, CAP);
+  const employers = new Set(rows.map((r) => r.employer)).size;
+
+  detail.innerHTML = `
+    <section class="card">
+      <h2>${esc(name)} <span style="color:var(--muted);font-weight:500">(${rows.length} ${esc(SCOPE_WORDS[state.scope])})</span></h2>
+      <p class="finding">
+        ${rows.length
+          ? `Across ${employers} ${employers === 1 ? "employer" : "employers"} on the watch list.` +
+            (rows.length > CAP ? ` Showing the first ${CAP}; use Browse to filter the rest.` : "")
+          : "Nothing open here right now."}
+      </p>
+      ${shown.length ? `<ul class="postings">${shown.map(postingItem).join("")}</ul>` : ""}
+    </section>`;
+  detail.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function select(code) {
+  state.selected = code;
+  document.getElementById("state-select").value = code;
+  for (const path of mapHost.querySelectorAll(".state")) {
+    path.setAttribute("aria-pressed", String(path.dataset.code === code));
+  }
+  renderDetail();
+}
+
+/* ---- wiring ---------------------------------------------------------- */
+
+function refresh() {
+  recount();
+  drawMap();
+  drawLegend();
+
+  // Postings a board placed nowhere specific never reach the map, so say how
+  // many rather than letting the totals quietly disagree.
+  const scoped = open.filter(inScope);
+  const placed = scoped.filter((r) => r.state).length;
+  aside.textContent =
+    `${placed.toLocaleString()} of ${scoped.length.toLocaleString()} open postings ` +
+    `${SCOPE_WORDS[state.scope]} sit in one named state. The other ` +
+    `${(scoped.length - placed).toLocaleString()} are remote, listed in several ` +
+    `places at once, or outside the United States, so they are not on the map.`;
+
+  renderDetail();
+}
+
+try {
+  const [{ history }, geoRes] = await Promise.all([
+    loadData(),
+    fetch("./assets/us-states.json"),
+  ]);
+  if (!geoRes.ok) throw new Error(`us-states.json: ${geoRes.status}`);
+  geo = await geoRes.json();
+
+  runDate = lastRunDate(history);
+  open = history.filter(isOpen);
+
+  asof.textContent =
+    `Open postings by state, as of the run on ${formatDate(runDate)}. ` +
+    `Brighter means more.`;
+
+  const select_ = document.getElementById("state-select");
+  for (const [code, shape] of Object.entries(geo.states)) {
+    const option = document.createElement("option");
+    option.value = code;
+    option.textContent = shape.name;
+    select_.append(option);
+  }
+  select_.addEventListener("change", (e) => {
+    if (e.target.value) select(e.target.value);
+  });
+
+  document.getElementById("scope").addEventListener("click", (event) => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    document.querySelectorAll("#scope button").forEach((b) => {
+      b.setAttribute("aria-pressed", String(b === button));
+    });
+    state.scope = button.dataset.scope;
+    refresh();
+  });
+
+  controls.hidden = false;
+  refresh();
+} catch (error) {
+  asof.textContent = "";
+  showError(mapHost, error);
+}
+</script>
+
+</body>
+</html>

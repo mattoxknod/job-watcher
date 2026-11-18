@@ -229,6 +229,38 @@ def region_of(location: str) -> str:
 ARKANSAS_REGIONS = [NORTHWEST_ARKANSAS, LITTLE_ROCK, "Arkansas"]
 
 
+_STATE_CODES = {name: code for code, name in US_STATES.items()}
+
+
+def state_of(location: str) -> str:
+    """The two-letter US state a posting sits in, or "" when there is none.
+
+    This is what the map colours by. It follows the same precedence as
+    :func:`region_of`: a named state wins over a city name, and a posting that
+    is remote, international, or listed in several places at once belongs to no
+    single state and returns "".
+    """
+    if not location or not location.strip():
+        return ""
+
+    text = location.strip()
+    lowered = text.lower()
+
+    if _MULTIPLE.match(text) or _REMOTE.search(lowered):
+        return ""
+
+    state = us_state(text)
+    if state:
+        return _STATE_CODES.get(state, "")
+
+    # No state named: the same distinctive city names region_of falls back on.
+    for region, cities in BARE_CITIES.items():
+        if _matches(lowered, cities):
+            return "AR" if region in (NORTHWEST_ARKANSAS, LITTLE_ROCK) else "TX"
+
+    return ""
+
+
 def is_primary(region: str) -> bool:
     return region in PRIMARY_REGIONS
 

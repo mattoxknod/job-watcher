@@ -58,7 +58,7 @@ uv run pytest                           # the test suite
 
 ## The watch list
 
-23 employers across three applicant tracking systems. Every board returns
+28 employers across three applicant tracking systems. Every board returns
 JSON to a request made with no login; none of them is read as HTML.
 
 | # | Employer | Applicant tracking system | Board |
@@ -84,8 +84,13 @@ JSON to a request made with no login; none of them is read as HTML.
 | 19 | Zekelman Industries | Workday | `zekelman.wd12` / `Careers` |
 | 20 | Simmons Foods | Workday | `simmons.wd504` / `Simmons-Careers` |
 | 21 | FedEx | Workday | `fedex.wd1` / `FXE-MEISA-External` |
-| 22 | Amazon | Amazon Jobs (in-house) | `amazon.jobs/en/search.json` |
-| 23 | JPMorgan Chase | Oracle Recruiting Cloud | `jpmc.fa.oraclecloud.com` |
+| 22 | State Street | Workday | `statestreet.wd1` / `Global` |
+| 23 | BlackRock | Workday | `blackrock.wd1` / `BlackRock_Professional` |
+| 24 | Ally Financial | Workday | `ally.wd1` / `Ally` |
+| 25 | General Mills | Workday | `genmills.wd1` / `GMI_External_Careers` |
+| 26 | Smithfield Foods | Workday | `smithfieldfoods.wd1` / `Careers` |
+| 27 | Amazon | Amazon Jobs (in-house) | `amazon.jobs/en/search.json` |
+| 28 | JPMorgan Chase | Oracle Recruiting Cloud | `jpmc.fa.oraclecloud.com` |
 
 Arkansas Children's, the University of Arkansas System and Simmons Bank are on
 the list for Little Rock and Northwest Arkansas, which the national employers
@@ -230,6 +235,45 @@ resolved to a state and so does not appear.
 
 ---
 
+## The map
+
+`map.html` colours every state by how many postings it holds and lets you click
+one to see them. The geometry is a file in the repository, not a mapping
+library from a CDN: the installed app has to work offline, so
+`scripts/build_map.py` projects public-domain Census state boundaries once and
+writes `assets/us-states.json` for the page to draw as plain SVG.
+
+The projection is **Albers equal-area conic**, with Alaska, Hawaii and Puerto
+Rico as insets on their own standard parallels. Equal-area is the point: on a
+map coloured by counts, a projection that inflated the northern states would
+overstate them.
+
+Colour runs on a single-hue ramp with **quantile breaks**, not even ones. A
+handful of states hold most of the openings, so even breaks would drop almost
+every state into the lightest band and the map would say nothing. The ramp is
+stepped separately for each theme rather than flipped: on light, more postings
+read darker; on dark, more postings read brighter.
+
+A posting only appears on the map if it resolves to one state. Remote postings,
+ones a board lists in several places at once, and anything outside the United
+States belong to no single state — the page says how many those are rather than
+letting the totals quietly disagree with the rest of the site.
+
+## Company logos
+
+Each employer's logo sits beside its postings. The images are files in the
+repository, fetched once by `scripts/fetch_logos.py`, rather than looked up
+from a logo service when a page opens. That keeps them working offline, and it
+means no third party is told which companies are being looked at.
+
+`assets/logos/index.json` records which logos exist. A company without one
+shows its initials instead — and because the manifest is checked first, a
+missing logo costs nothing rather than firing a 404 on every page load. Logos
+are drawn on white in both themes, since several are dark marks that would
+vanish on the dark surface.
+
+---
+
 ## The data
 
 Two files at fixed paths. The site loads both in the browser and does all the
@@ -259,8 +303,9 @@ One row per posting.
 | `region` | The region the location falls in (see below) |
 | `mech_role` | `true` when the title is mechanical engineering work |
 | `entry_level` | `true` when the title reads as entry level, an internship or a co-op |
+| `state` | Two-letter US state, or empty when the posting belongs to no single one |
 
-Those last three are the columns beyond what the project asks for. They are
+Those last four are the columns beyond what the project asks for. They are
 appended after `removed_date`, so the required columns keep the exact order the
 project lists them in.
 
@@ -313,6 +358,10 @@ Each loads the two data files and computes everything in the browser.
   internships first, with a switch to all levels, filters for employer and area
   of Arkansas, a title search, and its own shortlist kept separately from the
   Browse page's.
+* **`map.html` — Map.** Open postings by state on a clickable US map, coloured
+  by how many each state holds. Click a state, or pick one from the dropdown,
+  to see what is open there; switch between counting postings in my role, all
+  postings, or mechanical engineering.
 * **`market.html` — Market.** Seven sections, each with a heading that states the
   finding, a paragraph explaining it, and a chart: new postings per day (all and
   in role), removed postings per day, open postings per employer, days open with
@@ -371,6 +420,11 @@ be fetched from a CDN for the installed app to work.
 | `browse.html` | The Browse page |
 | `market.html` | The Market page |
 | `colton.html` | The For Colton page |
+| `map.html` | The Map page |
+| `assets/us-states.json` | State outlines, already projected, that the map draws |
+| `assets/logos/` | Company logos, with `index.json` saying which exist |
+| `scripts/build_map.py` | Builds `us-states.json` from public-domain boundaries |
+| `scripts/fetch_logos.py` | Fetches the company logos |
 | `assets/style.css` | Shared fonts, colors and chrome for all three pages |
 | `assets/data.js` | Loads and parses the two data files; shared page chrome |
 | `assets/charts.js` | The SVG charts, tooltips, legends and table views |

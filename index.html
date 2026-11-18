@@ -39,6 +39,7 @@
     <nav class="nav">
       <a href="index.html">Today</a>
       <a href="browse.html">Browse</a>
+      <a href="map.html">Map</a>
       <a href="market.html">Market</a>
       <a href="colton.html">For Colton</a>
     </nav>
@@ -64,7 +65,7 @@
 
 <script type="module">
 import {
-  loadData, initChrome, showError, formatRunTime, formatDate, lastRunDate,
+  loadData, initChrome, showError, formatRunTime, formatDate, lastRunDate, logoHtml,
 } from "./assets/data.js";
 import { esc } from "./assets/charts.js";
 
@@ -82,6 +83,7 @@ function postingItem(row) {
 
   return `
     <li class="posting">
+      ${logoHtml(row.source, row.employer)}
       <div class="body">
         <a class="title" href="${esc(row.url)}" target="_blank" rel="noopener">${esc(row.title || "(untitled)")}</a>
         <div class="meta">${meta}</div>
@@ -117,6 +119,7 @@ function sourceChip(source) {
   return `
     <div class="source ${source.ok ? "ok" : "bad"}">
       <span class="dot" aria-hidden="true"></span>
+      ${logoHtml(source.name, source.name)}
       <span class="nm">${esc(source.name)}</span>
       <span class="ct">${source.ok ? `${source.count}` : "failed"}</span>
     </div>`;

@@ -23,7 +23,7 @@ import csv
 from pathlib import Path
 
 from jobwatcher.mechanical import is_entry_level, is_mechanical
-from jobwatcher.region import region_of
+from jobwatcher.region import region_of, state_of
 from jobwatcher.role import in_role
 
 COLUMNS = [
@@ -47,6 +47,7 @@ COLUMNS = [
     "region",
     "mech_role",
     "entry_level",
+    "state",
 ]
 
 
@@ -85,6 +86,7 @@ def build_history(days: list[tuple[str, dict[str, list[dict]]]]) -> list[dict]:
                         "title": posting["title"],
                         "location": posting["location"],
                         "region": region_of(posting["location"]),
+                        "state": state_of(posting["location"]),
                         "mech_role": is_mechanical(posting["title"]),
                         "entry_level": is_entry_level(posting["title"]),
                         "department": posting["department"],
@@ -104,6 +106,7 @@ def build_history(days: list[tuple[str, dict[str, list[dict]]]]) -> list[dict]:
                 row["title"] = posting["title"]
                 row["location"] = posting["location"]
                 row["region"] = region_of(posting["location"])
+                row["state"] = state_of(posting["location"])
                 row["mech_role"] = is_mechanical(posting["title"])
                 row["entry_level"] = is_entry_level(posting["title"])
                 row["department"] = posting["department"]

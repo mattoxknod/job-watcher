@@ -17,6 +17,7 @@ SOURCES = [
     # ---- Workday -------------------------------------------------------
     {
         "name": "walmart",
+        "domain": "walmart.com",
         "employer": "Walmart",
         "ats": "Workday",
         "kind": "workday",
@@ -26,6 +27,7 @@ SOURCES = [
     },
     {
         "name": "bank_of_america",
+        "domain": "bankofamerica.com",
         "employer": "Bank of America",
         "ats": "Workday",
         "kind": "workday",
@@ -35,6 +37,7 @@ SOURCES = [
     },
     {
         "name": "citi",
+        "domain": "citi.com",
         "employer": "Citi",
         "ats": "Workday",
         "kind": "workday",
@@ -44,6 +47,7 @@ SOURCES = [
     },
     {
         "name": "capital_one",
+        "domain": "capitalone.com",
         "employer": "Capital One",
         "ats": "Workday",
         "kind": "workday",
@@ -53,6 +57,7 @@ SOURCES = [
     },
     {
         "name": "truist",
+        "domain": "truist.com",
         "employer": "Truist",
         "ats": "Workday",
         "kind": "workday",
@@ -62,6 +67,7 @@ SOURCES = [
     },
     {
         "name": "pnc",
+        "domain": "pnc.com",
         "employer": "PNC Financial Services",
         "ats": "Workday",
         "kind": "workday",
@@ -71,6 +77,7 @@ SOURCES = [
     },
     {
         "name": "northern_trust",
+        "domain": "northerntrust.com",
         "employer": "Northern Trust",
         "ats": "Workday",
         "kind": "workday",
@@ -80,6 +87,7 @@ SOURCES = [
     },
     {
         "name": "vanguard",
+        "domain": "vanguard.com",
         "employer": "The Vanguard Group",
         "ats": "Workday",
         "kind": "workday",
@@ -89,6 +97,7 @@ SOURCES = [
     },
     {
         "name": "federal_reserve",
+        "domain": "federalreserve.gov",
         "employer": "Federal Reserve System",
         "ats": "Workday",
         "kind": "workday",
@@ -98,6 +107,7 @@ SOURCES = [
     },
     {
         "name": "tyson_foods",
+        "domain": "tyson.com",
         "employer": "Tyson Foods",
         "ats": "Workday",
         "kind": "workday",
@@ -107,6 +117,7 @@ SOURCES = [
     },
     {
         "name": "jb_hunt",
+        "domain": "jbhunt.com",
         "employer": "J.B. Hunt Transport Services",
         "ats": "Workday",
         "kind": "workday",
@@ -116,6 +127,7 @@ SOURCES = [
     },
     {
         "name": "coca_cola",
+        "domain": "coca-colacompany.com",
         "employer": "The Coca-Cola Company",
         "ats": "Workday",
         "kind": "workday",
@@ -125,6 +137,7 @@ SOURCES = [
     },
     {
         "name": "acxiom",
+        "domain": "acxiom.com",
         "employer": "Acxiom",
         "ats": "Workday",
         "kind": "workday",
@@ -136,6 +149,7 @@ SOURCES = [
     # employers above barely cover.
     {
         "name": "arkansas_childrens",
+        "domain": "archildrens.org",
         "employer": "Arkansas Children's",
         "ats": "Workday",
         "kind": "workday",
@@ -145,6 +159,7 @@ SOURCES = [
     },
     {
         "name": "university_of_arkansas",
+        "domain": "uark.edu",
         "employer": "University of Arkansas System",
         "ats": "Workday",
         "kind": "workday",
@@ -154,6 +169,7 @@ SOURCES = [
     },
     {
         "name": "simmons_bank",
+        "domain": "simmonsbank.com",
         "employer": "Simmons Bank",
         "ats": "Workday",
         "kind": "workday",
@@ -165,6 +181,7 @@ SOURCES = [
     # engineering work the finance-led list above does not.
     {
         "name": "trane_technologies",
+        "domain": "tranetechnologies.com",
         "employer": "Trane Technologies",
         "ats": "Workday",
         "kind": "workday",
@@ -174,6 +191,7 @@ SOURCES = [
     },
     {
         "name": "kimberly_clark",
+        "domain": "kimberly-clark.com",
         "employer": "Kimberly-Clark",
         "ats": "Workday",
         "kind": "workday",
@@ -183,6 +201,7 @@ SOURCES = [
     },
     {
         "name": "zekelman",
+        "domain": "zekelman.com",
         "employer": "Zekelman Industries",
         "ats": "Workday",
         "kind": "workday",
@@ -192,6 +211,7 @@ SOURCES = [
     },
     {
         "name": "simmons_foods",
+        "domain": "simmonsfoods.com",
         "employer": "Simmons Foods",
         "ats": "Workday",
         "kind": "workday",
@@ -201,6 +221,7 @@ SOURCES = [
     },
     {
         "name": "fedex",
+        "domain": "fedex.com",
         "employer": "FedEx",
         "ats": "Workday",
         "kind": "workday",
@@ -208,9 +229,62 @@ SOURCES = [
         "host": "wd1",
         "site": "FXE-MEISA-External",
     },
+    # More of the same kinds of employer: asset managers and a digital bank
+    # alongside the banks above, two food manufacturers alongside Tyson.
+    {
+        "name": "state_street",
+        "domain": "statestreet.com",
+        "employer": "State Street",
+        "ats": "Workday",
+        "kind": "workday",
+        "tenant": "statestreet",
+        "host": "wd1",
+        "site": "Global",
+    },
+    {
+        "name": "blackrock",
+        "domain": "blackrock.com",
+        "employer": "BlackRock",
+        "ats": "Workday",
+        "kind": "workday",
+        "tenant": "blackrock",
+        "host": "wd1",
+        "site": "BlackRock_Professional",
+    },
+    {
+        "name": "ally",
+        "domain": "ally.com",
+        "employer": "Ally Financial",
+        "ats": "Workday",
+        "kind": "workday",
+        "tenant": "ally",
+        "host": "wd1",
+        "site": "Ally",
+    },
+    {
+        "name": "general_mills",
+        "domain": "generalmills.com",
+        "employer": "General Mills",
+        "ats": "Workday",
+        "kind": "workday",
+        "tenant": "genmills",
+        "host": "wd1",
+        "site": "GMI_External_Careers",
+    },
+    {
+        "name": "smithfield",
+        "domain": "smithfieldfoods.com",
+        "employer": "Smithfield Foods",
+        "ats": "Workday",
+        "kind": "workday",
+        "tenant": "smithfieldfoods",
+        "host": "wd1",
+        "site": "Careers",
+    },
     # ---- Other applicant tracking systems ------------------------------
     {
         "name": "amazon",
+        "domain": "amazon.com",
         "employer": "Amazon",
         "ats": "Amazon Jobs (in-house)",
         "kind": "amazon",
@@ -220,6 +294,7 @@ SOURCES = [
     },
     {
         "name": "jpmorgan_chase",
+        "domain": "jpmorganchase.com",
         "employer": "JPMorgan Chase",
         "ats": "Oracle Recruiting Cloud",
         "kind": "oracle",

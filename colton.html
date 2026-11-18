@@ -39,6 +39,7 @@
     <nav class="nav">
       <a href="index.html">Today</a>
       <a href="browse.html">Browse</a>
+      <a href="map.html">Map</a>
       <a href="market.html">Market</a>
       <a href="colton.html">For Colton</a>
     </nav>
@@ -104,7 +105,7 @@
 
 <script type="module">
 import {
-  loadData, initChrome, showError, formatDate, lastRunDate, isOpen, daysOpen,
+  loadData, initChrome, showError, formatDate, lastRunDate, isOpen, daysOpen, logoHtml,
 } from "./assets/data.js";
 import { esc } from "./assets/charts.js";
 
@@ -184,6 +185,7 @@ function postingItem(row) {
       <button class="star" type="button" aria-pressed="${starred}"
               data-id="${esc(row.posting_id)}"
               aria-label="${starred ? "Remove from" : "Add to"} shortlist">${starred ? "★" : "☆"}</button>
+      ${logoHtml(row.source, row.employer)}
       <div class="body">
         <a class="title" href="${esc(row.url)}" target="_blank" rel="noopener">${esc(row.title || "(untitled)")}</a>
         <div class="meta">${meta}</div>
