@@ -1,7 +1,154 @@
 {
   "run_date": "2026-11-18",
-  "run_time": "2026-11-18T04:05:57+00:00",
+  "run_time": "2026-11-18T04:10:16+00:00",
   "sources": [
+    {
+      "count": 2000,
+      "employer": "Walmart",
+      "error": "",
+      "name": "walmart",
+      "ok": true
+    },
+    {
+      "count": 1996,
+      "employer": "Bank of America",
+      "error": "",
+      "name": "bank_of_america",
+      "ok": true
+    },
+    {
+      "count": 2000,
+      "employer": "Citi",
+      "error": "",
+      "name": "citi",
+      "ok": true
+    },
+    {
+      "count": 2075,
+      "employer": "Capital One",
+      "error": "",
+      "name": "capital_one",
+      "ok": true
+    },
+    {
+      "count": 1384,
+      "employer": "Truist",
+      "error": "",
+      "name": "truist",
+      "ok": true
+    },
+    {
+      "count": 1127,
+      "employer": "PNC Financial Services",
+      "error": "",
+      "name": "pnc",
+      "ok": true
+    },
+    {
+      "count": 663,
+      "employer": "Northern Trust",
+      "error": "",
+      "name": "northern_trust",
+      "ok": true
+    },
+    {
+      "count": 320,
+      "employer": "The Vanguard Group",
+      "error": "",
+      "name": "vanguard",
+      "ok": true
+    },
+    {
+      "count": 150,
+      "employer": "Federal Reserve System",
+      "error": "",
+      "name": "federal_reserve",
+      "ok": true
+    },
+    {
+      "count": 772,
+      "employer": "Tyson Foods",
+      "error": "",
+      "name": "tyson_foods",
+      "ok": true
+    },
+    {
+      "count": 440,
+      "employer": "J.B. Hunt Transport Services",
+      "error": "",
+      "name": "jb_hunt",
+      "ok": true
+    },
+    {
+      "count": 211,
+      "employer": "The Coca-Cola Company",
+      "error": "",
+      "name": "coca_cola",
+      "ok": true
+    },
+    {
+      "count": 34,
+      "employer": "Acxiom",
+      "error": "",
+      "name": "acxiom",
+      "ok": true
+    },
+    {
+      "count": 226,
+      "employer": "Arkansas Children's",
+      "error": "",
+      "name": "arkansas_childrens",
+      "ok": true
+    },
+    {
+      "count": 811,
+      "employer": "University of Arkansas System",
+      "error": "",
+      "name": "university_of_arkansas",
+      "ok": true
+    },
+    {
+      "count": 155,
+      "employer": "Simmons Bank",
+      "error": "",
+      "name": "simmons_bank",
+      "ok": true
+    },
+    {
+      "count": 1562,
+      "employer": "Trane Technologies",
+      "error": "",
+      "name": "trane_technologies",
+      "ok": true
+    },
+    {
+      "count": 142,
+      "employer": "Kimberly-Clark",
+      "error": "",
+      "name": "kimberly_clark",
+      "ok": true
+    },
+    {
+      "count": 203,
+      "employer": "Zekelman Industries",
+      "error": "",
+      "name": "zekelman",
+      "ok": true
+    },
+    {
+      "count": 44,
+      "employer": "Simmons Foods",
+      "error": "",
+      "name": "simmons_foods",
+      "ok": true
+    },
+    {
+      "count": 47,
+      "employer": "FedEx",
+      "error": "",
+      "name": "fedex",
+      "ok": true
+    },
     {
       "count": 1186,
       "employer": "State Street",
@@ -35,6 +182,20 @@
       "employer": "Smithfield Foods",
       "error": "",
       "name": "smithfield",
+      "ok": true
+    },
+    {
+      "count": 683,
+      "employer": "Amazon",
+      "error": "",
+      "name": "amazon",
+      "ok": true
+    },
+    {
+      "count": 998,
+      "employer": "JPMorgan Chase",
+      "error": "",
+      "name": "jpmorgan_chase",
       "ok": true
     }
   ]
