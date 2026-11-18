@@ -1,10 +1,10 @@
 {
-  "run_time": "2026-11-18T04:10:16+00:00",
+  "run_time": "2026-11-18T04:14:39+00:00",
   "first_run_date": "2026-11-17",
   "days_with_success": 2,
-  "open": 20294,
+  "open": 20300,
   "new_today": 696,
-  "removed_today": 607,
+  "removed_today": 601,
   "sources": [
     {
       "name": "walmart",
