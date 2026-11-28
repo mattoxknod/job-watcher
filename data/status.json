@@ -1,10 +1,10 @@
 {
-  "run_time": "2026-11-27T19:59:10+00:00",
+  "run_time": "2026-11-28T18:58:23+00:00",
   "first_run_date": "2026-11-17",
-  "days_with_success": 11,
-  "open": 20059,
-  "new_today": 482,
-  "removed_today": 578,
+  "days_with_success": 12,
+  "open": 19983,
+  "new_today": 288,
+  "removed_today": 396,
   "sources": [
     {
       "name": "walmart",
@@ -14,7 +14,7 @@
     {
       "name": "bank_of_america",
       "ok": true,
-      "count": 1981
+      "count": 1973
     },
     {
       "name": "citi",
@@ -24,37 +24,37 @@
     {
       "name": "capital_one",
       "ok": true,
-      "count": 2052
+      "count": 2053
     },
     {
       "name": "truist",
       "ok": true,
-      "count": 1303
+      "count": 1302
     },
     {
       "name": "pnc",
       "ok": true,
-      "count": 1507
+      "count": 1543
     },
     {
       "name": "northern_trust",
       "ok": true,
-      "count": 658
+      "count": 655
     },
     {
       "name": "vanguard",
       "ok": true,
-      "count": 332
+      "count": 327
     },
     {
       "name": "federal_reserve",
       "ok": true,
-      "count": 145
+      "count": 137
     },
     {
       "name": "tyson_foods",
       "ok": true,
-      "count": 711
+      "count": 696
     },
     {
       "name": "jb_hunt",
@@ -64,7 +64,7 @@
     {
       "name": "coca_cola",
       "ok": true,
-      "count": 165
+      "count": 155
     },
     {
       "name": "acxiom",
@@ -79,12 +79,12 @@
     {
       "name": "university_of_arkansas",
       "ok": true,
-      "count": 812
+      "count": 799
     },
     {
       "name": "simmons_bank",
       "ok": true,
-      "count": 141
+      "count": 145
     },
     {
       "name": "trane_technologies",
@@ -99,7 +99,7 @@
     {
       "name": "zekelman",
       "ok": true,
-      "count": 196
+      "count": 195
     },
     {
       "name": "simmons_foods",
@@ -114,27 +114,27 @@
     {
       "name": "state_street",
       "ok": true,
-      "count": 1142
+      "count": 1136
     },
     {
       "name": "blackrock",
       "ok": true,
-      "count": 287
+      "count": 279
     },
     {
       "name": "ally",
       "ok": true,
-      "count": 78
+      "count": 76
     },
     {
       "name": "general_mills",
       "ok": true,
-      "count": 368
+      "count": 367
     },
     {
       "name": "smithfield",
       "ok": true,
-      "count": 554
+      "count": 556
     },
     {
       "name": "amazon",
@@ -144,7 +144,7 @@
     {
       "name": "jpmorgan_chase",
       "ok": true,
-      "count": 958
+      "count": 953
     }
   ]
 }
